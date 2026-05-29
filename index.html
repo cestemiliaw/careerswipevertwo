@@ -1,0 +1,1847 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Career Swipe</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --navy:#2F3A55;--navy-d:#1E2B42;--navy-lt:#E8EBF2;
+  --pr:#565449;--pr-lt:#EDE8DF;--pr-bd:#D8CFBC;
+  --ok:#3A5A40;--ok-lt:#DFF0E3;
+  --am:#6B5E3A;--am-lt:#F0E9D8;
+  --g0:#FFFBF4;--g1:#F4EFE6;--g2:#E8E2D8;--g3:#D8CFBC;
+  --g4:#8A8577;--g5:#6E6960;--g6:#565449;--g7:#3A3830;--g8:#11120D;
+  --wh:#FFFBF4;
+  --r8:8px;--r12:12px;--r16:16px;--r24:24px;
+  --sh:0 2px 8px rgba(17,18,13,.08);--sh-md:0 4px 20px rgba(17,18,13,.12);--sh-lg:0 12px 40px rgba(17,18,13,.18);
+  --nav-h:56px;--tab-h:62px;
+}
+html,body{height:100%;overflow:hidden;font-family:'Noto Serif TC',serif;background:var(--g0);color:var(--g8)}
+body{display:flex;flex-direction:column;max-width:430px;margin:0 auto;box-shadow:0 0 40px rgba(0,0,0,.14)}
+
+/* NAV */
+.nav{height:var(--nav-h);background:var(--navy);display:flex;align-items:center;justify-content:space-between;padding:0 18px;flex-shrink:0;z-index:100}
+.nav-logo{display:flex;align-items:center;gap:9px}
+.nav-logo svg{flex-shrink:0}
+.nav-title{display:flex;flex-direction:column;line-height:1.15}
+.nav-title span:first-child{font-size:15px;font-weight:700;color:#FFFBF4;letter-spacing:.03em}
+.nav-title span:last-child{font-size:9px;color:rgba(255,251,244,.5);letter-spacing:.06em}
+.nav-ava{width:30px;height:30px;border-radius:50%;background:rgba(255,251,244,.2);border:1.5px solid rgba(255,251,244,.35);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#FFFBF4;cursor:pointer}
+
+/* SCROLL */
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.pg{display:none;min-height:100%}
+.pg.on{display:block}
+
+/* TAB BAR */
+.tabs{height:var(--tab-h);background:var(--navy);display:flex;align-items:flex-start;justify-content:space-around;padding:8px 0 0;flex-shrink:0;border-top:1px solid rgba(255,251,244,.1);z-index:100}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;border:none;background:transparent;cursor:pointer;color:rgba(255,251,244,.4);font-family:'Noto Serif TC',serif;font-size:9.5px;letter-spacing:.02em;padding:0 2px;transition:color .15s}
+.tab.on{color:#FFFBF4}
+
+/* TOAST */
+.toast{position:fixed;bottom:calc(var(--tab-h)+14px);left:50%;transform:translateX(-50%) translateY(60px);background:var(--g8);color:#FFFBF4;padding:10px 20px;border-radius:40px;font-size:13px;z-index:999;transition:transform .3s;pointer-events:none;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* SHARED */
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;border-radius:var(--r12);font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:'Noto Serif TC',serif;transition:all .18s;line-height:1.4}
+.btn-pr{background:var(--navy);color:#FFFBF4}.btn-pr:active{background:var(--navy-d)}
+.btn-out{background:transparent;border:1.5px solid var(--g3);color:var(--g7)}
+.btn-ghost{background:var(--g1);color:var(--g6);border:none}
+.btn-ok{background:var(--ok);color:#FFFBF4}
+.btn-blk{width:100%}
+.tag{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500;margin:2px;cursor:default}
+.tb{background:var(--navy-lt);color:var(--navy)}
+.tp{background:var(--pr-lt);color:var(--pr)}
+.tg{background:var(--ok-lt);color:var(--ok)}
+.tam{background:var(--am-lt);color:var(--am)}
+.card{background:var(--wh);border-radius:var(--r16);border:1px solid var(--g2);overflow:hidden;box-shadow:var(--sh)}
+.chd{padding:14px 18px 12px;border-bottom:1px solid var(--g1);display:flex;align-items:center;justify-content:space-between}
+.cht{font-size:14px;font-weight:700}
+.cbd{padding:14px 18px}
+.slbl{font-size:10px;font-weight:700;color:var(--g4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+
+/* BOTTOM SHEET */
+.sheet-bg{display:none;position:fixed;inset:0;background:rgba(17,18,13,.55);z-index:800;align-items:flex-end;justify-content:center}
+.sheet-bg.show{display:flex}
+.sheet{background:var(--wh);border-radius:var(--r24) var(--r24) 0 0;width:100%;max-width:430px;max-height:90vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.sheet-handle{width:36px;height:4px;background:var(--g3);border-radius:2px;margin:14px auto 0}
+
+/* FORM */
+.form-lbl{font-size:13px;font-weight:600;color:var(--g6);margin-bottom:6px;display:block;margin-top:16px}
+.form-lbl:first-child{margin-top:0}
+.form-inp{width:100%;padding:11px 14px;border-radius:var(--r12);border:1.5px solid var(--g2);font-family:'Noto Serif TC',serif;font-size:14px;color:var(--g8);background:var(--wh);margin-bottom:2px}
+.form-inp:focus{outline:none;border-color:var(--navy)}
+.form-sel{width:100%;padding:11px 14px;border-radius:var(--r12);border:1.5px solid var(--g2);font-family:'Noto Serif TC',serif;font-size:14px;color:var(--g8);background:var(--wh);appearance:none;cursor:pointer}
+.form-sel:focus{outline:none;border-color:var(--navy)}
+.form-ta{width:100%;padding:10px 13px;border-radius:var(--r8);border:1.5px solid var(--g2);font-family:'Noto Serif TC',serif;font-size:13px;color:var(--g8);resize:none;height:80px;margin-bottom:10px}
+.form-ta:focus{outline:none;border-color:var(--navy)}
+
+/* ══════════════════════════════════
+   INTRO PAGE
+══════════════════════════════════ */
+#pg-intro{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100%;padding:32px 24px;text-align:center}
+
+/* ══════════════════════════════════
+   ONBOARD (基本資料 + 問卷)
+══════════════════════════════════ */
+.ob-hero{background:var(--navy);padding:26px 20px 22px}
+.ob-step{font-size:11px;color:rgba(255,251,244,.5);letter-spacing:.08em;margin-bottom:6px}
+.ob-title{font-size:22px;font-weight:700;color:#FFFBF4;margin-bottom:5px}
+.ob-desc{font-size:13px;color:rgba(255,251,244,.65);line-height:1.6}
+.ob-prog{height:4px;background:rgba(255,251,244,.15);border-radius:2px;margin-top:14px;overflow:hidden}
+.ob-prog-fill{height:100%;background:#FFFBF4;border-radius:2px;transition:width .4s}
+.ob-section{display:none;padding:20px 18px 28px}
+.ob-section.on{display:block}
+
+/* 問卷題目 */
+.q-card{background:var(--wh);border-radius:var(--r16);border:1px solid var(--g2);padding:18px;margin-bottom:14px;box-shadow:var(--sh)}
+.q-num{font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.q-dim-lbl{display:inline-block;padding:2px 8px;border-radius:20px;background:var(--navy-lt);color:var(--navy);font-size:10px;font-weight:700;margin-left:6px}
+.q-txt{font-size:14px;font-weight:700;color:var(--g8);line-height:1.5;margin-bottom:14px}
+.q-opts{display:flex;flex-direction:column;gap:8px}
+.q-opt{padding:10px 14px;border-radius:var(--r12);border:1.5px solid var(--g2);background:var(--wh);font-family:'Noto Serif TC',serif;font-size:13px;color:var(--g6);text-align:left;cursor:pointer;transition:all .18s;line-height:1.4;display:flex;align-items:center;gap:10px}
+.q-opt-letter{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--g3);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;color:var(--g4)}
+.q-opt:hover{border-color:var(--navy);background:var(--navy-lt)}
+.q-opt:hover .q-opt-letter{border-color:var(--navy);color:var(--navy)}
+.q-opt.sel{border-color:var(--navy);background:var(--navy);color:#FFFBF4}
+.q-opt.sel .q-opt-letter{border-color:rgba(255,251,244,.4);color:#FFFBF4;background:rgba(255,251,244,.15)}
+.q-rev{font-size:10px;color:var(--am);font-weight:600;float:right;padding:2px 8px;background:var(--am-lt);border-radius:20px}
+
+/* 矛盾提示 */
+.contradiction-box{background:var(--am-lt);border:1.5px solid var(--am);border-radius:var(--r12);padding:14px;margin-bottom:16px;display:none}
+.contradiction-box.show{display:block}
+.contradiction-title{font-size:13px;font-weight:700;color:var(--am);margin-bottom:8px}
+.contradiction-btns{display:flex;gap:8px;margin-top:10px}
+
+/* ══════════════════════════════════
+   IDEA PAGE（你有一個點子嗎？）
+══════════════════════════════════ */
+#pg-idea{padding:0}
+.idea-hero{background:var(--navy);padding:28px 20px 24px}
+.idea-hero h2{font-size:22px;font-weight:700;color:#FFFBF4;margin-bottom:6px}
+.idea-hero p{font-size:13px;color:rgba(255,251,244,.7);line-height:1.65}
+.idea-body{padding:20px 18px 28px}
+.idea-type-row{display:flex;gap:10px;margin-bottom:20px}
+.idea-type-btn{flex:1;padding:12px 8px;border-radius:var(--r12);border:2px solid var(--g2);background:var(--wh);font-family:'Noto Serif TC',serif;font-size:13px;font-weight:600;color:var(--g6);cursor:pointer;text-align:center;transition:all .18s;line-height:1.4}
+.idea-type-btn.sel{border-color:var(--navy);background:var(--navy-lt);color:var(--navy)}
+.idea-need-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px}
+.idea-need-item{padding:10px 12px;border-radius:var(--r12);border:1.5px solid var(--g2);background:var(--wh);font-family:'Noto Serif TC',serif;font-size:12px;color:var(--g6);cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .18s}
+.idea-need-item.sel{border-color:var(--navy);background:var(--navy-lt);color:var(--navy)}
+.idea-need-item .check{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--g3);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0}
+.idea-need-item.sel .check{background:var(--navy);border-color:var(--navy);color:#FFFBF4}
+.idea-skip{text-align:center;margin-top:10px}
+.idea-skip-btn{background:none;border:none;font-family:'Noto Serif TC',serif;font-size:12px;color:var(--g4);cursor:pointer;text-decoration:underline;padding:4px}
+
+/* ══════════════════════════════════
+   PROFILE PAGE
+══════════════════════════════════ */
+.profile-hero{background:var(--navy);padding:24px 18px 0;text-align:center}
+.profile-ava{width:68px;height:68px;border-radius:50%;background:rgba(255,251,244,.2);border:2px solid rgba(255,251,244,.3);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#FFFBF4;margin:0 auto 10px}
+.profile-name{font-size:18px;font-weight:700;color:#FFFBF4;margin-bottom:3px}
+.profile-dept{font-size:12px;color:rgba(255,251,244,.6)}
+.mascot-wrap{background:var(--wh);border-radius:var(--r16) var(--r16) 0 0;margin-top:18px;padding:18px 18px 0}
+.mascot-title{font-size:11px;font-weight:700;color:var(--g4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;text-align:center}
+.mascot-svg-wrap{display:flex;justify-content:center;margin-bottom:6px}
+.mascot-name{text-align:center;font-size:13px;font-weight:700;color:var(--navy);margin-bottom:3px}
+.mascot-type{text-align:center;font-size:11px;color:var(--g4);margin-bottom:14px}
+.skill-bars{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.skill-row{display:flex;align-items:center;gap:10px}
+.skill-lbl{font-size:11px;color:var(--g5);width:52px;flex-shrink:0;text-align:right}
+.skill-track{flex:1;height:6px;background:var(--g2);border-radius:3px;overflow:hidden}
+.skill-fill{height:100%;border-radius:3px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+
+/* 點子宣言展示 */
+.idea-card-display{margin:0 18px 12px;padding:14px 16px;background:var(--am-lt);border-radius:var(--r12);border:1.5px solid var(--am);display:none}
+.idea-card-display.show{display:block}
+.icd-header{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.icd-type{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--am);color:#FFFBF4}
+.icd-edit{font-size:11px;color:var(--am);text-decoration:underline;cursor:pointer;margin-left:auto}
+.icd-txt{font-size:13px;color:var(--g7);line-height:1.7;margin-bottom:8px}
+.icd-needs{display:flex;flex-wrap:wrap;gap:4px}
+
+/* 可編輯標籤 */
+.profile-tags-wrap{padding:14px 18px;background:var(--wh);border-top:1px solid var(--g1)}
+.tag-editable{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500;margin:2px}
+.tag-editable .del{width:14px;height:14px;border-radius:50%;background:rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;font-size:9px;cursor:pointer;flex-shrink:0}
+.add-tag-inp{border:1.5px dashed var(--g3);border-radius:20px;padding:3px 9px;font-size:11px;font-family:'Noto Serif TC',serif;color:var(--g5);background:transparent;cursor:pointer;margin:2px}
+.add-tag-inp:focus{outline:none;border-color:var(--navy)}
+
+/* 底部雙按鈕（個人頁 / 前輩故事） */
+.profile-bottom-btns{position:sticky;bottom:0;background:var(--wh);border-top:1px solid var(--g2);padding:12px 16px;display:grid;grid-template-columns:1fr 1fr;gap:10px;z-index:50}
+
+/* ══════════════════════════════════
+   MENTOR STORY PAGE (前輩故事)
+══════════════════════════════════ */
+.story-hero{background:var(--navy);padding:18px 18px 14px}
+.story-hero h2{font-size:18px;font-weight:700;color:#FFFBF4;margin-bottom:4px}
+.story-hero p{font-size:11px;color:rgba(255,251,244,.6);line-height:1.5}
+.story-filter{display:flex;gap:6px;padding:12px 16px 8px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.story-filter::-webkit-scrollbar{display:none}
+.sfbtn{flex-shrink:0;padding:5px 12px;border-radius:20px;border:1.5px solid var(--g3);background:var(--wh);font-family:'Noto Serif TC',serif;font-size:11px;font-weight:600;color:var(--g5);cursor:pointer;transition:all .18s;white-space:nowrap}
+.sfbtn.on{background:var(--navy);border-color:var(--navy);color:#FFFBF4}
+.story-list{padding:10px 16px;display:flex;flex-direction:column;gap:12px}
+
+/* 前輩卡片 */
+.mcard{background:var(--wh);border-radius:var(--r16);border:1px solid var(--g2);overflow:hidden;box-shadow:var(--sh);cursor:pointer;transition:all .18s}
+.mcard:active{transform:scale(.98)}
+.mcard-top{background:var(--navy);padding:14px 16px;display:flex;align-items:center;gap:12px}
+.mcard-ava{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:#FFFBF4;border:2px solid rgba(255,251,244,.3);flex-shrink:0}
+.mcard-info{flex:1;min-width:0}
+.mcard-name{font-size:15px;font-weight:700;color:#FFFBF4;margin-bottom:2px}
+.mcard-role{font-size:11px;color:rgba(255,251,244,.6)}
+.mcard-pct{flex-shrink:0;text-align:center}
+.mcard-pct-n{font-size:20px;font-weight:900;color:#FFFBF4;line-height:1}
+.mcard-pct-l{font-size:9px;color:rgba(255,251,244,.5);letter-spacing:.04em}
+.mcard-body{padding:12px 16px}
+.mcard-quote{font-size:13px;color:var(--g7);line-height:1.7;font-style:italic;margin-bottom:10px;padding-left:12px;border-left:3px solid var(--navy)}
+.mcard-actions{display:flex;gap:8px;padding-top:8px;border-top:1px solid var(--g1)}
+
+/* ══════════════════════════════════
+   MENTOR DETAIL PAGE
+══════════════════════════════════ */
+.mp-back{display:flex;align-items:center;gap:8px;padding:14px 16px 0;font-size:13px;color:var(--navy);font-weight:600;cursor:pointer}
+.mp-hero{background:var(--navy);padding:20px 18px 16px;text-align:center}
+.mp-ava{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#FFFBF4;border:2px solid rgba(255,251,244,.3);margin:0 auto 10px}
+.mp-name{font-size:18px;font-weight:700;color:#FFFBF4;margin-bottom:2px}
+.mp-role{font-size:12px;color:rgba(255,251,244,.6);margin-bottom:10px}
+.mp-quote-hero{font-size:14px;color:rgba(255,251,244,.9);line-height:1.7;font-style:italic;padding:12px 16px;background:rgba(255,251,244,.1);border-radius:var(--r12);text-align:left}
+.mascot-compare{padding:16px 18px;background:var(--wh);border-bottom:1px solid var(--g1)}
+.mc-title{font-size:11px;font-weight:700;color:var(--g4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;text-align:center}
+.mc-row{display:flex;align-items:flex-start;gap:12px}
+.mc-side{flex:1;text-align:center}
+.mc-side-lbl{font-size:10px;color:var(--g4);margin-bottom:6px}
+
+/* 節點時間軸 */
+.timeline{padding:14px 18px}
+.tl-lbl{font-size:11px;font-weight:700;color:var(--g4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:16px}
+.tl-node{position:relative;padding-left:36px;margin-bottom:0}
+.tl-node::before{content:'';position:absolute;left:13px;top:32px;width:1.5px;bottom:-16px;background:var(--g2)}
+.tl-node:last-child::before{display:none}
+.tl-dot{position:absolute;left:0;top:6px;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;z-index:1;border:2px solid var(--g2);background:var(--wh);color:var(--g5)}
+.tl-dot.cur{background:var(--navy);border-color:var(--navy);color:#FFFBF4}
+.tl-dot.key{background:var(--pr-lt);border-color:var(--pr);color:var(--pr)}
+.tl-card{background:var(--g1);border-radius:var(--r12);padding:12px 14px;margin-bottom:16px;cursor:pointer;transition:all .18s;border:1px solid transparent}
+.tl-card:hover{border-color:var(--navy)}
+.tl-card.open{border-color:var(--navy)}
+.tl-period{font-size:10px;color:var(--g4);font-weight:600;margin-bottom:3px}
+.tl-label{font-size:13px;font-weight:700;color:var(--g8);margin-bottom:5px}
+.tl-mood-row{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px}
+.tl-quote{font-size:12px;color:var(--g6);line-height:1.65;font-style:italic;padding:8px 10px;background:var(--wh);border-radius:var(--r8);border-left:3px solid var(--navy);margin-bottom:8px;display:none}
+.tl-card.open .tl-quote{display:block}
+.tl-detail{font-size:12px;color:var(--g5);line-height:1.7;display:none}
+.tl-card.open .tl-detail{display:block}
+.tl-action{display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--g2)}
+.tl-card.open .tl-action{display:block}
+.resonance-btn{width:100%;padding:9px;border-radius:var(--r8);border:1.5px solid var(--navy);background:transparent;color:var(--navy);font-family:'Noto Serif TC',serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .18s}
+.resonance-btn:hover{background:var(--navy);color:#FFFBF4}
+
+/* 指引卡 */
+.guide-body{padding:20px 18px 32px}
+.guide-title{font-size:16px;font-weight:700;margin-bottom:4px;color:var(--navy)}
+.guide-sub{font-size:12px;color:var(--g5);margin-bottom:16px;line-height:1.6}
+
+/* 三段式區塊 */
+.guide-block{border-radius:var(--r12);padding:12px 14px;margin-bottom:12px}
+.guide-block-header{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.guide-block-icon{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.guide-block-title{font-size:13px;font-weight:700}
+.guide-block-body{font-size:13px;line-height:1.75}
+
+/* 區塊一：做對了什麼（綠色） */
+.guide-block-1{background:var(--ok-lt);border:1px solid rgba(58,90,64,.2)}
+.guide-block-1 .guide-block-icon{background:var(--ok);color:#FFFBF4}
+.guide-block-1 .guide-block-title{color:var(--ok)}
+.guide-block-1 .guide-block-body{color:#3A4E3C}
+
+/* 區塊二：建議具備的經驗（藍色） */
+.guide-block-2{background:var(--navy-lt);border:1px solid rgba(47,58,85,.15)}
+.guide-block-2 .guide-block-icon{background:var(--navy);color:#FFFBF4}
+.guide-block-2 .guide-block-title{color:var(--navy)}
+.guide-block-2 .guide-block-body{color:var(--navy-d)}
+
+/* 區塊三：給你的建議（米色） */
+.guide-block-3{background:var(--pr-lt);border:1px solid rgba(86,84,73,.18)}
+.guide-block-3 .guide-block-icon{background:var(--pr);color:#FFFBF4}
+.guide-block-3 .guide-block-title{color:var(--pr)}
+.guide-block-3 .guide-block-body{color:var(--pr)}
+
+/* 資源卡片（重新設計） */
+.res-section-lbl{font-size:10px;font-weight:700;color:var(--g4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.res-category{margin-bottom:14px}
+.res-category-lbl{font-size:10px;font-weight:700;color:var(--g4);padding:3px 8px;background:var(--g2);border-radius:20px;display:inline-block;margin-bottom:6px}
+.res-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--r12);margin-bottom:6px;text-decoration:none;transition:all .18s;cursor:pointer;border:1px solid transparent}
+.res-card:active{transform:scale(.98)}
+.res-card-gov{background:var(--navy-lt);border-color:rgba(47,58,85,.15)}
+.res-card-gov:hover{border-color:var(--navy)}
+.res-card-course{background:var(--ok-lt);border-color:rgba(58,90,64,.15)}
+.res-card-course:hover{border-color:var(--ok)}
+.res-card-icon{width:34px;height:34px;border-radius:var(--r8);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.res-card-gov .res-card-icon{background:var(--navy)}
+.res-card-course .res-card-icon{background:var(--ok)}
+.res-card-info{flex:1;min-width:0}
+.res-card-name{font-size:12px;font-weight:700;color:var(--g8);margin-bottom:1px;line-height:1.3}
+.res-card-org{font-size:10px;color:var(--g4)}
+.res-card-arrow{font-size:14px;color:var(--g3);flex-shrink:0}
+
+/* 聯絡 */
+.contact-sec{padding:16px 18px 28px}
+.contact-note{font-size:11px;color:var(--g4);line-height:1.6;margin-bottom:12px;padding:10px 12px;background:var(--am-lt);border-radius:var(--r8)}
+.badge-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;background:var(--navy-lt);color:var(--navy);font-size:11px;font-weight:700}
+
+/* ══════════════════════════════════
+   ENTERPRISE PAGE (企業端)
+══════════════════════════════════ */
+#pg-enterprise{padding:0}
+.ent-hero{background:linear-gradient(135deg,var(--navy) 0%,#1a3a5c 100%);padding:28px 20px 24px}
+.ent-hero-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.ent-hero h2{font-size:20px;font-weight:700;color:#FFFBF4;margin-bottom:5px}
+.ent-hero p{font-size:12px;color:rgba(255,251,244,.7);line-height:1.65}
+.ent-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;background:rgba(255,251,244,.15);border:1px solid rgba(255,251,244,.3);color:#FFFBF4;font-size:10px;font-weight:700}
+
+/* 企業功能區塊 */
+.ent-section{padding:14px 16px}
+.ent-tabs{display:flex;gap:8px;padding:12px 16px 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.ent-tabs::-webkit-scrollbar{display:none}
+.etbtn{flex-shrink:0;padding:7px 14px;border-radius:var(--r12);border:1.5px solid var(--g2);background:var(--wh);font-family:'Noto Serif TC',serif;font-size:12px;font-weight:600;color:var(--g5);cursor:pointer;transition:all .18s}
+.etbtn.on{background:var(--navy);border-color:var(--navy);color:#FFFBF4}
+
+/* 人才卡片 */
+.talent-card{background:var(--wh);border-radius:var(--r16);border:1px solid var(--g2);padding:14px 16px;margin-bottom:10px;box-shadow:var(--sh);cursor:pointer;transition:all .18s}
+.talent-card:active{transform:scale(.98)}
+.tc-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.tc-ava{width:40px;height:40px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#FFFBF4;flex-shrink:0}
+.tc-info{flex:1;min-width:0}
+.tc-name{font-size:14px;font-weight:700;color:var(--g8)}
+.tc-dept{font-size:11px;color:var(--g4);margin-top:1px}
+.tc-idea-badge{background:var(--am-lt);color:var(--am);font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;flex-shrink:0}
+.tc-idea-txt{font-size:12px;color:var(--g6);line-height:1.65;margin-bottom:8px;padding:8px 10px;background:var(--am-lt);border-radius:var(--r8);border-left:3px solid var(--am)}
+.tc-actions{display:flex;gap:8px}
+
+/* 點子宣言列表 */
+.idea-item{background:var(--wh);border-radius:var(--r16);border:1px solid var(--g2);padding:14px 16px;margin-bottom:10px;box-shadow:var(--sh)}
+.ii-header{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.ii-type{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--am);color:#FFFBF4}
+.ii-name{font-size:12px;color:var(--g5)}
+.ii-txt{font-size:13px;color:var(--g7);line-height:1.7;margin-bottom:8px}
+.ii-actions{display:flex;gap:8px}
+
+/* 篩選器 */
+.filter-row{display:flex;gap:6px;padding:8px 16px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.filter-row::-webkit-scrollbar{display:none}
+.fbtn{flex-shrink:0;padding:4px 11px;border-radius:20px;border:1.5px solid var(--g3);background:var(--wh);font-family:'Noto Serif TC',serif;font-size:11px;font-weight:600;color:var(--g5);cursor:pointer;transition:all .18s;white-space:nowrap}
+.fbtn.on{background:var(--navy-lt);border-color:var(--navy);color:var(--navy)}
+
+/* 企業進駐表單 */
+.ent-form-wrap{padding:16px 18px 32px}
+.ent-form-card{background:var(--wh);border-radius:var(--r16);border:1px solid var(--g2);padding:16px;margin-bottom:12px;box-shadow:var(--sh)}
+.ent-form-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:4px}
+.ent-form-desc{font-size:12px;color:var(--g5);line-height:1.6;margin-bottom:14px}
+.industry-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.ind-item{padding:10px 12px;border-radius:var(--r12);border:1.5px solid var(--g2);background:var(--wh);font-family:'Noto Serif TC',serif;font-size:12px;color:var(--g6);cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .18s}
+.ind-item.sel{border-color:var(--navy);background:var(--navy-lt);color:var(--navy)}
+.ind-icon{font-size:16px;flex-shrink:0}
+
+/* 通知設定 */
+.notif-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--g1)}
+.notif-row:last-child{border-bottom:none}
+.notif-info{flex:1;padding-right:12px}
+.notif-ttl{font-size:13px;font-weight:600;color:var(--g8);margin-bottom:2px}
+.notif-desc{font-size:11px;color:var(--g4);line-height:1.5}
+.toggle{width:44px;height:24px;border-radius:12px;background:var(--g3);position:relative;cursor:pointer;transition:background .2s;flex-shrink:0}
+.toggle.on{background:var(--navy)}
+.toggle::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:white;transition:transform .2s;box-shadow:var(--sh)}
+.toggle.on::after{transform:translateX(20px)}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="nav">
+  <div class="nav-logo">
+    <svg width="32" height="32" viewBox="0 0 38 38" fill="none">
+      <rect width="38" height="38" rx="9" fill="rgba(255,251,244,.15)"/>
+      <path d="M24.1 11.6 A9.5 9.5 0 1 0 24.1 26.4" stroke="#FFFBF4" stroke-width="2.6" stroke-linecap="round" fill="none"/>
+      <line x1="24.5" y1="19" x2="30" y2="19" stroke="#FFFBF4" stroke-width="2.2" stroke-linecap="round"/>
+      <polyline points="27.2,15.8 30.8,19 27.2,22.2" stroke="#FFFBF4" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </svg>
+    <div class="nav-title"><span>Career Swipe</span><span>臺北市政府青年局</span></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px" onclick="goPg('enterprise')">企業端</button>
+    <div class="nav-ava" id="navAva">張</div>
+  </div>
+</div>
+
+<!-- SCROLL -->
+<div class="scroll" id="scrollArea">
+<div class="toast" id="toast"></div>
+
+<!-- ══ INTRO ══ -->
+<div class="pg on" id="pg-intro">
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;min-height:calc(100vh - 118px)">
+    <div style="width:72px;height:72px;border-radius:18px;background:var(--navy);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;box-shadow:var(--sh-md)">
+      <svg width="40" height="40" viewBox="0 0 38 38" fill="none"><path d="M24.1 11.6 A9.5 9.5 0 1 0 24.1 26.4" stroke="#FFFBF4" stroke-width="2.8" stroke-linecap="round" fill="none"/><line x1="24.5" y1="19" x2="31" y2="19" stroke="#FFFBF4" stroke-width="2.4" stroke-linecap="round"/><polyline points="27.5,15.5 31.5,19 27.5,22.5" stroke="#FFFBF4" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+    </div>
+    <div style="font-size:26px;font-weight:900;color:var(--navy);margin-bottom:8px;line-height:1.2">看見前人走的路<br>讓你的夢想被看見</div>
+    <div style="font-size:14px;color:var(--g5);line-height:1.7;margin-bottom:24px;max-width:280px">透過標籤配對，找到走過你這條路的人。也讓你的點子被對的人發現。</div>
+    <div style="font-size:13px;font-style:italic;color:var(--g4);margin-bottom:36px;padding:14px 20px;border-left:3px solid var(--navy);background:var(--g1);border-radius:0 var(--r8) var(--r8) 0;text-align:left;line-height:1.7;max-width:320px">「我不知道我會的東西叫什麼，<br>也不知道對誰有用。」<br><span style="font-size:11px;color:var(--g4);margin-top:4px;display:block">— 很多還在走的人，都說過這句話</span></div>
+    <button class="btn btn-pr btn-blk" style="max-width:280px;padding:14px" onclick="goPg('onboard')">開始配對</button>
+    <button class="btn btn-ghost btn-blk" style="max-width:280px;margin-top:10px;padding:12px" onclick="skipToProfile()">已有資料，直接進入</button>
+  </div>
+</div>
+
+<!-- ══ ONBOARD ══ -->
+<div class="pg" id="pg-onboard">
+  <div class="ob-hero">
+    <div class="ob-step" id="obStep">步驟 1 / 2</div>
+    <div class="ob-title" id="obTitle">基本資料</div>
+    <div class="ob-desc" id="obDesc">讓我們先認識你</div>
+    <div class="ob-prog"><div class="ob-prog-fill" id="obProg" style="width:50%"></div></div>
+  </div>
+
+  <!-- Section 1：基本資料 -->
+  <div class="ob-section on" id="ob1">
+    <label class="form-lbl">姓名</label>
+    <input class="form-inp" id="uName" type="text" placeholder="張小晏" value="張小晏">
+    <label class="form-lbl">科系</label>
+    <input class="form-inp" id="uDept" type="text" placeholder="人類學系" value="人類學系">
+    <label class="form-lbl">年級</label>
+    <select class="form-sel" id="uGrade">
+      <option>大一</option><option>大二</option><option>大三</option><option selected>大四（應屆）</option>
+      <option>研究所</option><option>已畢業</option>
+    </select>
+    <label class="form-lbl">所在地區</label>
+    <select class="form-sel" id="uArea">
+      <option selected>台北市</option><option>新北市</option><option>其他縣市</option>
+    </select>
+    <div style="margin-top:24px">
+      <button class="btn btn-pr btn-blk" onclick="obNext(1)">下一步</button>
+    </div>
+  </div>
+
+  <!-- Section 2：問卷 -->
+  <div class="ob-section" id="ob2">
+    <div style="margin-bottom:14px;padding-top:2px">
+      <div style="font-size:13px;color:var(--g5);line-height:1.6">每題沒有對錯，選最接近你真實狀態的就好。</div>
+    </div>
+    <!-- 矛盾提示框 -->
+    <div class="contradiction-box" id="contradictionBox">
+      <div class="contradiction-title">你的答案有點矛盾，要重新看看嗎？</div>
+      <div style="font-size:12px;color:var(--am);line-height:1.6" id="contradictionDetail"></div>
+      <div class="contradiction-btns">
+        <button class="btn btn-out btn-sm" onclick="dismissContradiction()">重新作答</button>
+        <button class="btn btn-pr btn-sm" onclick="forceSubmit()">繼續送出</button>
+      </div>
+    </div>
+    <!-- 缺題提示 -->
+    <div id="missingAlert" style="display:none;background:var(--no-lt,#F5E0E0);border:1.5px solid #C05050;border-radius:var(--r12);padding:12px 14px;margin-bottom:14px;font-size:13px;color:#7A2B2B">有題目尚未作答，請確認每題都已選擇後再送出。</div>
+    <div id="nanAlert" style="display:none;background:var(--no-lt,#F5E0E0);border:1.5px solid #C05050;border-radius:var(--r12);padding:12px 14px;margin-bottom:14px;font-size:13px;color:#7A2B2B">分數計算發生錯誤，請重新作答。</div>
+    <div id="qContainer"></div>
+    <div style="margin-top:8px">
+      <button class="btn btn-pr btn-blk" onclick="cs_submitQuiz()" id="btnSubmitQ">生成我的標籤與吉祥物</button>
+    </div>
+  </div>
+
+  <!-- Section 3：生成中 -->
+  <div class="ob-section" id="ob3" style="text-align:center;padding-top:48px">
+    <div style="font-size:48px;margin-bottom:16px;animation:spin 1.5s linear infinite">◎</div>
+    <div style="font-size:18px;font-weight:700;color:var(--navy);margin-bottom:8px">正在分析你的標籤</div>
+    <div style="font-size:13px;color:var(--g5);line-height:1.7">根據你的回答，<br>我們正在生成你的能力吉祥物<br>以及配對向量⋯⋯</div>
+  </div>
+</div>
+
+<!-- ══ IDEA PAGE ══ -->
+<div class="pg" id="pg-idea">
+  <div class="idea-hero">
+    <h2>你有一個點子嗎？</h2>
+    <p>說出來，讓走過相似路的前輩看到你，<br>也讓對的企業找到你。不說也完全沒關係。</p>
+  </div>
+  <div class="idea-body">
+    <label class="form-lbl" style="margin-top:0">這是一個⋯⋯</label>
+    <div class="idea-type-row" id="ideaTypeRow">
+      <button class="idea-type-btn" onclick="selectIdeaType('dream',this)">💭 夢想<br><span style="font-size:11px;font-weight:400;color:var(--g4)">我想成為 / 我想做</span></button>
+      <button class="idea-type-btn" onclick="selectIdeaType('idea',this)">💡 點子<br><span style="font-size:11px;font-weight:400;color:var(--g4)">我有一個想法</span></button>
+    </div>
+    <label class="form-lbl">用一句話說說看</label>
+    <textarea class="form-ta" id="ideaTxt" style="height:70px" placeholder="例：我想為台北的插畫家建立一個直接接案的平台……"></textarea>
+    <label class="form-lbl">我現在需要（可複選）</label>
+    <div class="idea-need-grid" id="ideaNeedGrid">
+      <div class="idea-need-item" onclick="toggleNeed(this,'前輩引導')"><div class="check">✓</div>前輩引導</div>
+      <div class="idea-need-item" onclick="toggleNeed(this,'相似路徑故事')"><div class="check">✓</div>相似路徑故事</div>
+      <div class="idea-need-item" onclick="toggleNeed(this,'政府資源')"><div class="check">✓</div>政府資源</div>
+      <div class="idea-need-item" onclick="toggleNeed(this,'企業對接')"><div class="check">✓</div>企業對接</div>
+      <div class="idea-need-item" onclick="toggleNeed(this,'合作夥伴')"><div class="check">✓</div>合作夥伴</div>
+      <div class="idea-need-item" onclick="toggleNeed(this,'技術協助')"><div class="check">✓</div>技術協助</div>
+    </div>
+    <div style="margin-top:20px;display:flex;flex-direction:column;gap:10px">
+      <button class="btn btn-pr btn-blk" onclick="saveIdea()">發佈宣言，進入個人頁</button>
+      <button class="btn btn-ghost btn-blk" onclick="skipIdea()">先跳過，直接進入</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PROFILE ══ -->
+<div class="pg" id="pg-profile">
+  <div class="profile-hero">
+    <div class="profile-ava" id="pAva">張</div>
+    <div class="profile-name" id="pName">張小晏</div>
+    <div class="profile-dept" id="pDept">台北市 · 人類學系 · 大四（應屆）</div>
+    <div class="mascot-wrap" id="mascotWrap">
+      <div class="mascot-title">我的能力吉祥物</div>
+      <div class="mascot-svg-wrap" id="mascotSvg"></div>
+      <div class="mascot-name" id="mascotName">載入中⋯</div>
+      <div class="mascot-type" id="mascotType"></div>
+      <div class="skill-bars" id="skillBars"></div>
+    </div>
+  </div>
+
+  <!-- 點子宣言 -->
+  <div class="idea-card-display" id="ideaCardDisplay">
+    <div class="icd-header">
+      <span class="icd-type" id="icdType">夢想</span>
+      <span class="icd-edit" onclick="goPg('idea')">編輯</span>
+    </div>
+    <div class="icd-txt" id="icdTxt"></div>
+    <div class="icd-needs" id="icdNeeds"></div>
+  </div>
+
+  <!-- 標籤（可編輯） -->
+  <div class="profile-tags-wrap">
+    <div style="margin-bottom:14px">
+      <div class="slbl">欄位標籤 <span style="font-size:9px;font-weight:400;color:var(--g4);text-transform:none;letter-spacing:0">（可自行新增/刪除）</span></div>
+      <div id="fieldTags"></div>
+      <input class="add-tag-inp" id="addFieldTagInp" placeholder="+ 新增欄位標籤" onkeydown="addTag('field',event)">
+    </div>
+    <div>
+      <div class="slbl">心理標籤 <span style="font-size:9px;font-weight:400;color:var(--g4);text-transform:none;letter-spacing:0">（可自行新增/刪除）</span></div>
+      <div id="psychTags"></div>
+      <input class="add-tag-inp" id="addPsychTagInp" placeholder="+ 新增心理標籤" onkeydown="addTag('psych',event)">
+    </div>
+    <div style="margin-top:10px">
+      <button class="btn btn-ghost" style="font-size:12px;padding:6px 14px" onclick="goPg('onboard')">覺得不準嗎？重新測驗</button>
+    </div>
+  </div>
+
+  <!-- 收藏的前輩 -->
+  <div style="padding:14px 18px">
+    <div class="slbl">收藏的前輩</div>
+    <div id="savedList"><div style="font-size:13px;color:var(--g4)">在前輩故事頁收藏後會出現在這裡</div></div>
+  </div>
+
+  <!-- 底部雙按鈕 -->
+  <div class="profile-bottom-btns">
+    <button class="btn btn-pr" onclick="goPg('story')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="margin-right:6px"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      前輩故事
+    </button>
+    <button class="btn btn-out" onclick="goPg('enterprise')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="margin-right:6px"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+      企業端
+    </button>
+  </div>
+</div>
+
+<!-- ══ STORY PAGE（前輩故事） ══ -->
+<div class="pg" id="pg-story">
+  <div class="story-hero">
+    <h2>前輩故事館</h2>
+    <p>找到走過你這條路的人。<br>依你的標籤配對，相似度由高至低排列。</p>
+  </div>
+  <div class="story-filter">
+    <button class="sfbtn on" onclick="filterStory('all',this)">全部</button>
+    <button class="sfbtn" onclick="filterStory('arts',this)">文組路徑</button>
+    <button class="sfbtn" onclick="filterStory('ai',this)">AI 轉型</button>
+    <button class="sfbtn" onclick="filterStory('career',this)">跨域轉職</button>
+    <button class="sfbtn" onclick="filterStory('idea',this)">有點子的人</button>
+  </div>
+  <div class="story-list" id="storyList"></div>
+</div>
+
+<!-- ══ MENTOR DETAIL ══ -->
+<div class="pg" id="pg-mentor">
+  <div class="mp-back" onclick="goPg('story')">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+    返回故事館
+  </div>
+  <div class="mp-hero">
+    <div class="mp-ava" id="mpAva">吳</div>
+    <div class="mp-name" id="mpName">吳品潔</div>
+    <div class="mp-role" id="mpRole">UX 研究員</div>
+    <div class="mp-quote-hero" id="mpQuote"></div>
+  </div>
+  <div style="padding:12px 18px;background:var(--wh);border-bottom:1px solid var(--g1)" id="mpTagsWrap"></div>
+  <div class="mascot-compare" id="mpCompare">
+    <div class="mc-title">能力對照</div>
+    <div class="mc-row">
+      <div class="mc-side"><div class="mc-side-lbl">你</div><div id="mcUserSvg"></div><div style="font-size:11px;font-weight:700;color:var(--navy);margin-top:4px" id="mcUserName"></div></div>
+      <div style="display:flex;align-items:center;font-size:20px;color:var(--g3);padding-top:20px">⟷</div>
+      <div class="mc-side"><div class="mc-side-lbl">前輩</div><div id="mcMentorSvg"></div><div style="font-size:11px;font-weight:700;color:var(--navy);margin-top:4px" id="mcMentorName"></div></div>
+    </div>
+    <div style="font-size:11px;color:var(--g4);text-align:center;margin-top:10px;line-height:1.6" id="mcNote"></div>
+  </div>
+  <div class="timeline" id="mpTimeline"></div>
+  <div class="contact-sec" id="mpContact"></div>
+</div>
+
+<!-- ══ ENTERPRISE PAGE ══ -->
+<div class="pg" id="pg-enterprise">
+  <div class="ent-hero">
+    <div class="ent-hero-top">
+      <h2>企業端</h2>
+      <span class="ent-badge">🏛 台北市政府認可企業夥伴</span>
+    </div>
+    <p>不看履歷，看思維地圖。<br>找到真正適合你們的年輕聲音。</p>
+  </div>
+
+  <!-- 企業功能切換 -->
+  <div class="ent-tabs">
+    <button class="etbtn on" onclick="switchEntTab('talent',this)">瀏覽人才</button>
+    <button class="etbtn" onclick="switchEntTab('ideas',this)">點子宣言</button>
+    <button class="etbtn" onclick="switchEntTab('notify',this)">通知設定</button>
+    <button class="etbtn" onclick="switchEntTab('join',this)">企業進駐</button>
+  </div>
+
+  <!-- 瀏覽人才 -->
+  <div id="ent-talent" class="ent-section">
+    <div style="font-size:13px;color:var(--g5);line-height:1.6;margin-bottom:10px">你看到的不是履歷，而是青年的職涯地圖與思維標籤。</div>
+    <div class="filter-row">
+      <button class="fbtn on" onclick="filterTalent('all',this)">全部</button>
+      <button class="fbtn" onclick="filterTalent('arts',this)">藝文創意</button>
+      <button class="fbtn" onclick="filterTalent('fin',this)">金融轉型</button>
+      <button class="fbtn" onclick="filterTalent('idea',this)">有點子的人</button>
+      <button class="fbtn" onclick="filterTalent('fresh',this)">應屆畢業</button>
+    </div>
+    <div id="talentList" style="padding:10px 0"></div>
+  </div>
+
+  <!-- 點子宣言 -->
+  <div id="ent-ideas" class="ent-section" style="display:none">
+    <div style="font-size:13px;color:var(--g5);line-height:1.6;margin-bottom:10px">青年公開發表的夢想與點子，你可以直接表達興趣或主動邀請。</div>
+    <div class="filter-row">
+      <button class="fbtn on" onclick="filterIdeas('all',this)">全部宣言</button>
+      <button class="fbtn" onclick="filterIdeas('dream',this)">夢想</button>
+      <button class="fbtn" onclick="filterIdeas('idea',this)">點子</button>
+    </div>
+    <div id="ideasList" style="padding:10px 0"></div>
+  </div>
+
+  <!-- 通知設定 -->
+  <div id="ent-notify" class="ent-section" style="display:none">
+    <div class="ent-form-card">
+      <div class="ent-form-title">設定感興趣的標籤</div>
+      <div class="ent-form-desc">當有符合以下標籤的青年發布宣言時，系統會通知你。</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px" id="notifyTagsWrap">
+        <span class="tag tb" style="cursor:pointer" onclick="toggleNotifyTag(this)">創意產業</span>
+        <span class="tag tb" style="cursor:pointer" onclick="toggleNotifyTag(this)">藝文背景</span>
+        <span class="tag tp" style="cursor:pointer;background:var(--navy-lt);color:var(--navy)" onclick="toggleNotifyTag(this)">有點子</span>
+        <span class="tag tg" style="cursor:pointer" onclick="toggleNotifyTag(this)">應屆畢業</span>
+        <span class="tag tam" style="cursor:pointer" onclick="toggleNotifyTag(this)">跨域轉型</span>
+        <span class="tag tb" style="cursor:pointer" onclick="toggleNotifyTag(this)">金融業</span>
+      </div>
+      <button class="btn btn-pr btn-blk" onclick="showToast('通知設定已儲存')">儲存設定</button>
+    </div>
+    <div class="ent-form-card">
+      <div class="ent-form-title">通知方式</div>
+      <div class="notif-row">
+        <div class="notif-info"><div class="notif-ttl">每日摘要</div><div class="notif-desc">每天早上彙整符合標籤的新宣言</div></div>
+        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <div class="notif-row">
+        <div class="notif-info"><div class="notif-ttl">即時通知</div><div class="notif-desc">有新宣言立即推送</div></div>
+        <div class="toggle" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <div class="notif-row">
+        <div class="notif-info"><div class="notif-ttl">高度相符提醒</div><div class="notif-desc">相似度 85% 以上才通知</div></div>
+        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 企業進駐 -->
+  <div id="ent-join" class="ent-section" style="display:none">
+    <div class="ent-form-card">
+      <div class="ent-form-title">🏛 台北市政府認可企業夥伴</div>
+      <div class="ent-form-desc">進駐後取得官方認可標章，提升與青年對話的公信力。<br>初期優先開放：藝文創意產業 × 金融業轉型。</div>
+      <label class="form-lbl" style="margin-top:0">企業名稱</label>
+      <input class="form-inp" placeholder="公司 / 組織名稱">
+      <label class="form-lbl">產業類型（可複選）</label>
+      <div class="industry-grid">
+        <div class="ind-item sel" onclick="this.classList.toggle('sel')"><span class="ind-icon">🎨</span>藝文創意</div>
+        <div class="ind-item" onclick="this.classList.toggle('sel')"><span class="ind-icon">💰</span>金融轉型</div>
+        <div class="ind-item" onclick="this.classList.toggle('sel')"><span class="ind-icon">💻</span>科技產業</div>
+        <div class="ind-item" onclick="this.classList.toggle('sel')"><span class="ind-icon">🌱</span>社會創新</div>
+        <div class="ind-item" onclick="this.classList.toggle('sel')"><span class="ind-icon">📊</span>管顧策略</div>
+        <div class="ind-item" onclick="this.classList.toggle('sel')"><span class="ind-icon">🎵</span>音樂展演</div>
+      </div>
+      <label class="form-lbl">目前的人才需求與轉型方向</label>
+      <textarea class="form-ta" style="height:90px" placeholder="例：我們正在進行數位轉型，需要能理解用戶行為、又有跨域思維的年輕人……"></textarea>
+      <label class="form-lbl">你最感興趣的青年標籤組合</label>
+      <input class="form-inp" placeholder="例：創意產業 + 有點子 + 藝文背景">
+      <div style="margin-top:16px">
+        <button class="btn btn-pr btn-blk" onclick="showToast('已送出進駐申請，青年局將於 3 個工作天內審核')">送出進駐申請</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end scroll -->
+
+<!-- TAB BAR -->
+<nav class="tabs" id="tabBar" style="display:none">
+  <button class="tab on" id="tab-profile" onclick="goPg('profile')">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>個人檔案
+  </button>
+  <button class="tab" id="tab-story" onclick="goPg('story')">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>前輩故事
+  </button>
+  <button class="tab" id="tab-enterprise" onclick="goPg('enterprise')">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>企業端
+  </button>
+</nav>
+
+<!-- 指引卡 -->
+<div class="sheet-bg" id="guideBg" onclick="closeGuide(event)">
+  <div class="sheet"><div class="sheet-handle"></div><div class="guide-body" id="guideBody"></div></div>
+</div>
+
+<style>
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// MENTOR 向量設定區
+// 新增 Mentor 方法：複製下方其中一個物件，填入：
+//   id：對應現有 Mentor 資料的識別符
+//   name：顯示名稱
+//   rawScores：五個維度的分數，每個值填 0.0–1.0 之間的小數
+//             （填 null 表示尚未設定，系統會自動跳過此 Mentor）
+// 注意：rawScores 不做動態加權，直接作為固定基準向量使用
+// D1=動力來源 D2=方向感 D3=學用落差 D4=壓力回應 D5=面對困境
+// ═══════════════════════════════════════════════════════════════
+const MENTOR_VECTORS = [
+  { id: "mentor_001", name: "吳品潔",
+    rawScores: { D1: 0.75, D2: 0.80, D3: 0.55, D4: 0.70, D5: 0.85 } },
+  { id: "mentor_002", name: "林柏宇",
+    rawScores: { D1: 0.85, D2: 0.65, D3: 0.40, D4: 0.80, D5: 0.60 } },
+  { id: "mentor_003", name: "陳映廷",
+    rawScores: { D1: 0.70, D2: 0.90, D3: 0.65, D4: 0.60, D5: 0.90 } },
+];
+
+// ═══════════════════════════════════════════════════════════════
+// 問卷題目（14 題，依 D1–D5 分組）
+// ═══════════════════════════════════════════════════════════════
+const QUESTIONS_14 = [
+  // D1 動力來源
+  { qn:'Q1',  dim:'D1', lbl:'動力來源',
+    txt:'你做一件事的主要動力通常是⋯⋯',
+    opts:['對這件事本身有熱情，做了就覺得有意義','覺得這對我的未來有用','身邊的人都在做，不想落後','想證明自己做得到'] },
+  { qn:'Q2',  dim:'D1', lbl:'動力來源',
+    txt:'工作或學習上最讓你有成就感的是⋯⋯',
+    opts:['幫到了一個具體的人','學到了新東西、能力提升','被別人認可、稱讚','完成了一個有挑戰性的目標'] },
+  { qn:'Q3',  dim:'D1', lbl:'動力來源',
+    txt:'當你對一件事失去動力，通常是因為⋯⋯',
+    opts:['感覺跟自己的價值觀不符','看不到這件事的意義','做不到、能力不夠','別人好像不在乎'] },
+  // D2 方向感
+  { qn:'Q4',  dim:'D2', lbl:'方向感',
+    txt:'對於未來的職涯方向，你現在的狀態⋯⋯',
+    opts:['完全不知道，很焦慮','有模糊的方向，但不確定怎麼走','有具體方向，但不知道從哪裡開始','方向很清楚，在按計劃推進'] },
+  { qn:'Q5',  dim:'D2', lbl:'方向感',
+    txt:'你覺得自己的能力和未來想做的事⋯⋯',
+    opts:['完全對不上，不知道從哪裡補','有點對不上，需要一些橋接','大致上符合，還需要加強某些部分','很符合，有信心可以走這條路'] },
+  { qn:'Q6',  dim:'D2', lbl:'方向感',
+    txt:'如果讓你現在就要做職涯決定，你最大的障礙是⋯⋯',
+    opts:['根本不知道有哪些選擇','知道選項但不知道自己適合什麼','知道適合什麼但不知道怎麼開始','資源或機會還不夠，想開始但卡住了'] },
+  // D3 學用落差
+  { qn:'Q7',  dim:'D3', lbl:'學用落差',
+    txt:'你覺得在學校學的東西和你想做的工作之間⋯⋯',
+    opts:['差很多，我學的東西完全用不上','差一點，需要自學補充','有一定關聯，但還需要轉化','非常相關，學的就是我要用的'] },
+  { qn:'Q8',  dim:'D3', lbl:'學用落差',
+    txt:'如果有人問你「你的專業能做什麼工作」，你會⋯⋯',
+    opts:['不知道怎麼回答，想到就焦慮','可以說一兩個，但沒有說服力','能說出幾個，但感覺說不清楚','可以清楚說明自己的能力對應什麼職業'] },
+  // D4 壓力回應
+  { qn:'Q9',  dim:'D4', lbl:'壓力回應',
+    txt:'面對壓力和不確定性時，你通常⋯⋯',
+    opts:['很難接受，會焦慮很久','不太舒服，但勉強能繼續','可以撐過去，事後才消化','還好，壓力對我來說有時反而是動力'] },
+  { qn:'Q10', dim:'D4', lbl:'壓力回應',
+    txt:'當你做一件沒有把握的事，你最常的反應是⋯⋯',
+    opts:['先觀望，等比較確定再動','反覆確認、問很多問題才行動','先做一小步，再根據結果調整','直接衝，邊做邊學'] },
+  { qn:'Q11', dim:'D4', lbl:'壓力回應',
+    txt:'如果計劃趕不上變化、事情跟預期不同，你會⋯⋯',
+    opts:['很難接受，需要很長時間才能調整','不開心，但最終能接受','稍微不舒服，很快就能重新規劃','覺得正常，彈性調整就好'] },
+  // D5 面對困境
+  { qn:'Q12', dim:'D5', lbl:'面對困境',
+    txt:'遇到挫折或失敗時，你通常⋯⋯',
+    opts:['很難走出來，容易鑽牛角尖','需要一段時間，但最終能站起來','難過一下，但很快就能重新出發','把它當作學習，很快就調整方向'] },
+  { qn:'Q13', dim:'D5', lbl:'面對困境',
+    txt:'你身邊有沒有在職涯上可以請教的人？',
+    opts:['完全沒有，身邊的人都不懂我的困境','很少，找不到走過相似路的人','有一兩個，但不夠深入','有，可以從他們身上獲得具體的建議'] },
+  { qn:'Q14', dim:'D5', lbl:'面對困境', isReverse: true,
+    txt:'（反向題）當你考慮一件重要的事，你通常會⋯⋯',
+    opts:['很快就決定，不喜歡猶豫太久','大致想清楚就行動','想得很仔細，確認沒問題才行動','反覆考慮，難以做最後決定'] },
+];
+
+// ═══════════════════════════════════════════════════════════════
+// 計分對照表（每題 A/B/C/D 對應分數）
+// cs_ 前綴＝CareerSwipe 計算函式
+// ═══════════════════════════════════════════════════════════════
+const cs_SCORE_TABLE = {
+  Q1:  { A:0.25, B:0.10, C:0.65, D:0.90 },
+  Q2:  { A:0.10, B:0.35, C:0.75, D:0.90 },
+  Q3:  { A:0.30, B:0.10, C:0.65, D:0.90 },
+  Q4:  { A:0.10, B:0.25, C:0.65, D:0.90 },
+  Q5:  { A:0.10, B:0.35, C:0.65, D:0.90 },
+  Q6:  { A:0.10, B:0.30, C:0.70, D:0.95 },
+  Q7:  { A:0.10, B:0.30, C:0.65, D:0.95 },
+  Q8:  { A:0.10, B:0.35, C:0.65, D:0.90 },
+  Q9:  { A:0.10, B:0.35, C:0.65, D:0.90 },
+  Q10: { A:0.10, B:0.40, C:0.70, D:0.95 },
+  Q11: { A:0.10, B:0.40, C:0.70, D:0.90 },
+  Q12: { A:0.10, B:0.35, C:0.65, D:0.90 },
+  Q13: { A:0.10, B:0.35, C:0.65, D:0.95 },
+  // Q14 為反向題，獨立對應表
+  Q14_REVERSE: { A:0.90, B:0.65, C:0.35, D:0.10 },
+};
+
+// ═══════════════════════════════════════════════════════════════
+// 任務一：問卷計分
+// ═══════════════════════════════════════════════════════════════
+function cs_calcRawScores(answers) {
+  // answers = { Q1:'A', Q2:'B', ... Q14:'C' }
+  const letters = ['A','B','C','D'];
+
+  // 取單題分數
+  function getScore(qn, letter) {
+    if (qn === 'Q14') {
+      return cs_SCORE_TABLE['Q14_REVERSE'][letter] ?? null;
+    }
+    return cs_SCORE_TABLE[qn]?.[letter] ?? null;
+  }
+
+  const scores = {};
+  for (let i = 1; i <= 14; i++) {
+    const qn = 'Q' + i;
+    const letter = answers[qn];
+    scores[qn] = letter ? getScore(qn, letter) : null;
+  }
+
+  // 維度平均
+  const D1 = (scores.Q1 + scores.Q2 + scores.Q3) / 3;
+  const D2 = (scores.Q4 + scores.Q5 + scores.Q6) / 3;
+  const D3 = (scores.Q7 + scores.Q8) / 2;
+  const D4 = (scores.Q9 + scores.Q10 + scores.Q11) / 3;
+  const D5 = (scores.Q12 + scores.Q13 + scores.Q14) / 3;
+
+  return { D1, D2, D3, D4, D5, _raw: scores };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 任務二：動態權重計算
+// ═══════════════════════════════════════════════════════════════
+function cs_getWeight(dimKey, rawScore) {
+  // D3 學用落差例外：低分降權
+  if (dimKey === 'D3' && rawScore < 0.2) return 0.8;
+
+  // 極端區（不含端點 0.2 和 0.8）
+  if (rawScore < 0.2 || rawScore > 0.8) return 1.5;
+  // 偏向區（含端點）
+  if (rawScore <= 0.4 || rawScore <= 0.8) return 1.2;
+  // 中間區
+  return 1.0;
+}
+
+function cs_calcWeightedVector(rawDims) {
+  const dims = ['D1','D2','D3','D4','D5'];
+  const vector = {};
+  dims.forEach(d => {
+    const w = cs_getWeight(d, rawDims[d]);
+    vector[d] = rawDims[d] * w;
+    // 不做截斷，可能超過 1.0
+  });
+  return vector;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 任務四：餘弦相似度
+// ═══════════════════════════════════════════════════════════════
+function cs_cosineSim(userVec, mentorRaw) {
+  const dims = ['D1','D2','D3','D4','D5'];
+  let dot = 0, normA = 0, normB = 0;
+  dims.forEach(d => {
+    const a = userVec[d] ?? 0;
+    const b = mentorRaw[d] ?? 0;
+    dot  += a * b;
+    normA += a * a;
+    normB += b * b;
+  });
+  if (normA === 0 || normB === 0) return null; // 除以零防護
+  return dot / (Math.sqrt(normA) * Math.sqrt(normB));
+}
+
+function cs_rankMentors(userVec) {
+  const results = [];
+  MENTOR_VECTORS.forEach(mv => {
+    // Mentor 值域驗證
+    const valid = Object.entries(mv.rawScores).every(([dim, val]) => {
+      if (val === null) return true;
+      if (val < 0 || val > 1) {
+        console.warn(`[CareerSwipe] Mentor ${mv.name} 的 ${dim} 數值超出範圍，已跳過`);
+        return false;
+      }
+      return true;
+    });
+    if (!valid) return;
+
+    // 若所有 rawScores 為 null，跳過
+    const hasScore = Object.values(mv.rawScores).some(v => v !== null);
+    if (!hasScore) return;
+
+    // 補 null 為 0
+    const raw = {};
+    ['D1','D2','D3','D4','D5'].forEach(d => { raw[d] = mv.rawScores[d] ?? 0; });
+
+    const sim = cs_cosineSim(userVec, raw);
+    if (sim === null) return; // Mentor 向量模長為 0
+    results.push({ id: mv.id, name: mv.name, sim });
+  });
+  results.sort((a, b) => b.sim - a.sim);
+  return results;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 任務五：防矛盾檢查
+// ═══════════════════════════════════════════════════════════════
+function cs_checkContradictions(answers) {
+  const letters = ['A','B','C','D'];
+  function score(qn, letter) {
+    if (qn === 'Q14') return cs_SCORE_TABLE['Q14_REVERSE'][letter] ?? 0;
+    return cs_SCORE_TABLE[qn]?.[letter] ?? 0;
+  }
+  const pairs = [
+    { a:'Q1', b:'Q2', label:'動力來源（Q1 × Q2）' },
+    { a:'Q4', b:'Q5', label:'方向感（Q4 × Q5）'  },
+    { a:'Q9', b:'Q10', label:'壓力回應（Q9 × Q10）' },
+    { a:'Q12', b:'Q14', label:'面對困境（Q12 × Q14）' },
+  ];
+  const issues = [];
+  pairs.forEach(p => {
+    const la = answers[p.a], lb = answers[p.b];
+    if (!la || !lb) return;
+    const sa = score(p.a, la), sb = score(p.b, lb);
+    if (Math.abs(sa - sb) > 0.5) issues.push(p.label);
+  });
+  return issues;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 任務六：問卷送出主流程（含防呆）
+// ═══════════════════════════════════════════════════════════════
+let _forceSubmit = false;
+
+function cs_submitQuiz(force) {
+  document.getElementById('missingAlert').style.display = 'none';
+  document.getElementById('nanAlert').style.display = 'none';
+  document.getElementById('contradictionBox').classList.remove('show');
+
+  // 1. 建立 answers 物件
+  const letters = ['A','B','C','D'];
+  const answers = {};
+  let missing = false;
+  QUESTIONS_14.forEach((q, i) => {
+    const sel = document.querySelector(`#q14_${i} .q-opt.sel`);
+    if (!sel) { missing = true; return; }
+    const idx = parseInt(sel.dataset.idx);
+    answers[q.qn] = letters[idx];
+  });
+
+  if (missing && !force) {
+    document.getElementById('missingAlert').style.display = 'block';
+    return;
+  }
+
+  // 2. 計分
+  const rawDims = cs_calcRawScores(answers);
+
+  // NaN 防護
+  const dimKeys = ['D1','D2','D3','D4','D5'];
+  for (const d of dimKeys) {
+    if (isNaN(rawDims[d])) {
+      console.error(`[CareerSwipe] 維度 ${d} 計算結果為 NaN`);
+      document.getElementById('nanAlert').style.display = 'block';
+      return;
+    }
+  }
+
+  // 3. 矛盾檢查（非強制送出時才檢查）
+  if (!force) {
+    const issues = cs_checkContradictions(answers);
+    if (issues.length > 0) {
+      document.getElementById('contradictionDetail').textContent =
+        '矛盾題組：' + issues.join('、');
+      document.getElementById('contradictionBox').classList.add('show');
+      _pendingAnswers = answers;
+      _pendingRaw = rawDims;
+      return;
+    }
+  }
+
+  // 4. 動態加權
+  const wVec = cs_calcWeightedVector(rawDims);
+
+  // 5. Mentor 排序
+  const ranked = cs_rankMentors(wVec);
+  const matchScores = ranked.reduce((acc, r) => { acc[r.id] = r.sim; return acc; }, {});
+
+  // 6. 存 localStorage
+  try {
+    localStorage.setItem('cs_userVector', JSON.stringify(wVec));
+    localStorage.setItem('cs_matchScores', JSON.stringify(matchScores));
+  } catch(e) {
+    console.warn('[CareerSwipe] localStorage 寫入失敗，使用記憶體暫存');
+  }
+
+  // 7. 更新全域狀態
+  userVector_5D = wVec;
+  userRawDims = rawDims;
+  cs_applyMatchOrder(ranked);
+
+  // 8. 生成標籤
+  cs_generateTags(rawDims);
+
+  // 9. 進入生成動畫
+  showObSec(3);
+  setTimeout(() => { goPg('idea'); }, 1600);
+}
+
+let _pendingAnswers = null;
+let _pendingRaw = null;
+
+function forceSubmit() {
+  cs_submitQuiz(true);
+}
+function dismissContradiction() {
+  document.getElementById('contradictionBox').classList.remove('show');
+  document.getElementById('scrollArea').scrollTop = 0;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Mentor 排序應用到顯示順序
+// ═══════════════════════════════════════════════════════════════
+function cs_applyMatchOrder(ranked) {
+  if (!ranked || !ranked.length) return;
+  const idToIdx = { mentor_001: 0, mentor_002: 1, mentor_003: 2 };
+  const orderedIds = ranked.map(r => r.id);
+  cs_mentorOrder = orderedIds.map(id => idToIdx[id]).filter(i => i !== undefined);
+  // 更新配對分數
+  ranked.forEach(r => {
+    const idx = idToIdx[r.id];
+    if (idx !== undefined) {
+      MENTORS[idx]._simScore = Math.round(r.sim * 100);
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 標籤生成（依五維度）
+// ═══════════════════════════════════════════════════════════════
+function cs_generateTags(rawDims) {
+  const D1_labels = { lo:'外在比較導向', mid:'混合動力型', hi:'內在意義導向' };
+  const D2_labels = { lo:'方向空白型', mid:'方向模糊摸索中', hi:'方向清晰型' };
+  const D3_labels = { lo:'學用高落差', mid:'學用部分銜接', hi:'學用高度吻合' };
+  const D4_labels = { lo:'高壓敏感型', mid:'中等承壓型', hi:'高彈性抗壓型' };
+  const D5_labels = { lo:'困境難走出型', mid:'慢熱恢復型', hi:'快速調適型' };
+
+  function pick(v, map) { return v < 0.4 ? map.lo : v < 0.7 ? map.mid : map.hi; }
+
+  userTags.psych = [
+    pick(rawDims.D1, D1_labels),
+    pick(rawDims.D2, D2_labels),
+    pick(rawDims.D3, D3_labels),
+    pick(rawDims.D4, D4_labels),
+    pick(rawDims.D5, D5_labels),
+  ];
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 六維技能維度（用於吉祥物和顯示）
+// ═══════════════════════════════════════════════════════════════
+const SKILL_DIMS = [
+  { key:'comm',  lbl:'溝通力', color:'#4E7AC7' },
+  { key:'analy', lbl:'分析力', color:'#3A8A5F' },
+  { key:'creat', lbl:'創造力', color:'#9B6BB5' },
+  { key:'lang',  lbl:'外語力', color:'#C77A4E' },
+  { key:'exec',  lbl:'執行力', color:'#B5513A' },
+  { key:'empa',  lbl:'同理力', color:'#4E9BB5' },
+];
+
+// ═══════════════════════════════════════════════════════════════
+// Mentor 資料
+// ═══════════════════════════════════════════════════════════════
+const MENTORS = [
+  {
+    id:0, ava:'吳', avaBg:'#565449', name:'吳品潔', role:'UX 研究員', dept:'社會學系→科技產業',
+    type:'arts',
+    skills:{ comm:0.7, analy:0.8, creat:0.75, lang:0.55, exec:0.65, empa:0.9 },
+    quote:'田野調查和使用者訪談，其實是同一件事。我花了好幾年才把這件事說清楚。',
+    fieldTags:['社會學背景','質性研究','非技術本科'],
+    psychTags:['陪伴探索型','對不確定性高耐受','內在意義導向'],
+    matchReason:'你們都以「理解他人」為核心驅動力。她的同理力和你高度重疊，而她已經找到了那個能力的名字。',
+    ideaNote: null,
+    timeline:[
+      {period:'2013–2017',label:'社會學系大學',mood:['好奇探索','有點迷茫'],quote:'我不知道社會學能做什麼，但我很喜歡田野課。',detail:'每次田野課都讓我感覺這是我真正想做的事，但找不到對應的職業名稱。',困境:'不知道所學能對應什麼職業',處理:'繼續做田野，先累積，再找方向',did:'持續做讓自己有感覺的事，即使當時說不清理由。',suggestion:'試著記錄每次田野觀察的發現，整理成簡單的洞察筆記。',dotCls:''},
+      {period:'2017–2019',label:'方向探索期',mood:['焦慮','掙扎但繼續'],quote:'別人都在投履歷，我還不知道要投什麼。',detail:'投了幾份文案、助理類的工作，感覺都不對。偶爾接觸到UX這個詞，但不知道自己能做。',困境:'覺得自己的能力說不清楚',處理:'參加設計思考工作坊，第一次聽到「使用者研究」',did:'沒有放棄找「感覺對」的事，即使過程很痛。',suggestion:'去參加一個工作坊或體驗課，讓身體感受一下那個職業的日常。',dotCls:'key'},
+      {period:'2019–2021',label:'第一份UX相關工作',mood:['轉捩點','有點怕但做了'],quote:'我把田野訪談的邏輯帶進使用者訪談，才發現我一直在做這件事。',detail:'在新創公司做了第一個使用者研究專案。那個瞬間我意識到，田野調查的核心技能就是UX研究。',困境:'沒有技術背景，怕不夠格',處理:'以質性研究能力為主軸，補充基本的可用性測試知識',did:'用已有的質性研究能力作為入場券，不是等到「夠格」才開始。',suggestion:'先做一個小規模的使用者訪談專案，把過程和結論整理成一頁報告。',dotCls:'key'},
+      {period:'2022–現在',label:'UX 研究員（現職）',mood:['穩定中成長'],quote:'現在，有人問我我的工作是什麼，我知道怎麼回答了。',detail:'在中型科技公司擔任UX研究員，主持使用者訪談、可用性測試，協助產品設計。',困境:'',處理:'',did:'',suggestion:'',dotCls:'cur'},
+    ],
+    contact:{ note:'吳品潔目前有空時會查看訊息，可能需要幾天才能回覆。平台不保證回覆，請傳送具體問題。', badges:['回覆過 3 人'] },
+  },
+  {
+    id:1, ava:'林', avaBg:'#2F3A55', name:'林柏宇', role:'品牌策略專員', dept:'外文系→品牌行銷',
+    type:'arts',
+    skills:{ comm:0.9, analy:0.6, creat:0.85, lang:0.95, exec:0.8, empa:0.6 },
+    quote:'外文系學的是如何理解不同的語言和文化——這在品牌這個行業，比你想像的更值錢。',
+    fieldTags:['外文系背景','海外經驗','內容策略'],
+    psychTags:['目標導向型','直接給建議','高彈性抗壓型'],
+    matchReason:'你有深度觀察人的能力，他有把觀察轉化為品牌語言的能力。兩者的動力來源都是「讓事情被看見」。',
+    ideaNote: '我有一個點子：台灣的插畫家需要一個不靠中間人就能直接接國際品牌案的平台。',
+    timeline:[
+      {period:'2015–2019',label:'外文系大學',mood:['清楚但窄'],quote:'大家說外文系好找工作，但我不知道找什麼。',detail:'喜歡文學，喜歡語言，但對直接當翻譯沒興趣。開始做社團活動行銷，第一次感覺到「讓事情被看見」的成就感。',困境:'不知道外文系能做什麼有意義的事',處理:'透過社團活動累積行銷實作經驗',dotCls:''},
+      {period:'2019–2021',label:'新加坡工作',mood:['刺激','成長快'],quote:'離開台灣才知道自己有多少。',detail:'在新加坡廣告公司做文案，接觸到不同文化的品牌操作。外語能力和文化敏感度在這裡都發揮了作用。',困境:'工作壓力大，要快速證明自己',處理:'以文化洞察為差異化優勢，建立自己的品牌語言',dotCls:'key'},
+      {period:'2021–現在',label:'品牌策略專員（現職）',mood:['穩定、有方向'],quote:'我知道我的核心競爭力是什麼了。',detail:'回台灣後進入數位行銷公司，負責品牌定位與內容策略。每天都在把複雜的東西說得讓人聽得懂。',困境:'',處理:'',dotCls:'cur'},
+    ],
+    contact:{ note:'林柏宇偏好接收具體問題，請說明你的背景與你想了解的事情，他會視情況回覆。', badges:[] },
+  },
+  {
+    id:2, ava:'陳', avaBg:'#6E6960', name:'陳映廷', role:'UX 研究員', dept:'人類學系→科技產業',
+    type:'arts',
+    skills:{ comm:0.65, analy:0.75, creat:0.6, lang:0.5, exec:0.55, empa:0.95 },
+    quote:'別人說「人類學系能做什麼」，我也曾經沒有答案。但後來我發現，我一直在做使用者研究，只是沒有人告訴我那個名字。',
+    fieldTags:['人類學背景','田野調查','文組跨域'],
+    psychTags:['非典型入場','方向空白期2年','以理解他人為驅動'],
+    matchReason:'她和你幾乎走過完全相同的路。同樣的科系、同樣的困境、同樣的驅動力。',
+    ideaNote: null,
+    timeline:[
+      {period:'2017–2021',label:'台大人類學系',mood:['好奇','慢慢焦慮'],quote:'田野很好玩，但我不知道畢業能做什麼。',detail:'每次田野課都是最快樂的時光，但大四開始看到同學都在準備面試，開始覺得慌。',困境:'不知道所學能對應什麼職業',處理:'先把田野做好，相信這個能力之後會有用',did:'把田野的核心技能（觀察、訪談、記錄）做到很紮實，這是後來轉型的底氣。',suggestion:'整理過去田野的訪談筆記，試著用「使用者洞察」的角度重新描述你的發現。',dotCls:''},
+      {period:'2021–2023',label:'方向探索期',mood:['方向空白','掙扎但繼續'],quote:'我不知道我會的東西叫什麼，也不知道對誰有用。',detail:'試過幾份兼職，包括NGO研究助理、文案。直到有人介紹UX研究，才第一次感覺「這就是我在做的事」。',困境:'能力說不清楚，覺得自己什麼都不是',處理:'參加青年以戰代訓計畫，完成第一個UX研究專案',did:'沒有放棄嘗試，即使每一份兼職都感覺「不對」，每次嘗試都在縮小搜尋範圍。',suggestion:'去參加「青年以戰代訓計畫」，在真實場景裡用你的能力做一個小專案，感受一下。',dotCls:'key'},
+      {period:'2023–現在',label:'UX 研究員（現職）',mood:['找到了'],quote:'現在有人問我，我知道怎麼回答了。那個感覺，跟在部落做田野的時候，一模一樣。',detail:'在科技新創擔任UX研究員，主持使用者訪談、可用性測試。每天都在用田野的邏輯做產品研究。',困境:'',處理:'',did:'',suggestion:'',dotCls:'cur'},
+    ],
+    contact:{ note:'陳映廷的故事整理自公開分享，如需聯繫請透過平台留言，她會視時間決定是否回覆。', badges:['回覆過 1 人'] },
+  },
+];
+
+// ═══════════════════════════════════════════════════════════════
+// 全域狀態
+// ═══════════════════════════════════════════════════════════════
+let userData = { name:'張小晏', dept:'人類學系', grade:'大四（應屆）', area:'台北市' };
+let userTags  = { field:['台大人類學系','應屆畢業','質性研究','田野調查×2'], psych:['內在意義導向','方向空白型','學用高落差','中等承壓型','慢熱恢復型'] };
+let userVector_5D = {};  // D1–D5 加權向量
+let userRawDims   = {};  // D1–D5 原始分
+let userSkills6   = {};  // 六維技能（顯示用）
+let savedMentors  = [];
+let ideaData      = { type:'', txt:'', needs:[] };
+let currentMentor = null;
+let cs_mentorOrder = [0,1,2]; // 預設順序
+
+// localStorage 讀取
+function loadStorage() {
+  try {
+    const d = JSON.parse(localStorage.getItem('cs_data') || '{}');
+    if (d.userData)   userData   = d.userData;
+    if (d.userTags)   userTags   = d.userTags;
+    if (d.savedMentors) savedMentors = d.savedMentors;
+    if (d.ideaData)   ideaData   = d.ideaData;
+    const sv = localStorage.getItem('cs_userVector');
+    if (sv) userVector_5D = JSON.parse(sv);
+    const sm = localStorage.getItem('cs_matchScores');
+    if (sm) {
+      const scores = JSON.parse(sm);
+      const idToIdx = { mentor_001:0, mentor_002:1, mentor_003:2 };
+      const ranked = Object.entries(scores)
+        .map(([id,sim]) => ({ id, sim }))
+        .sort((a,b) => b.sim - a.sim);
+      cs_applyMatchOrder(ranked);
+    }
+  } catch(e) {
+    console.warn('[CareerSwipe] localStorage 讀取失敗');
+  }
+}
+
+function saveStorage() {
+  try {
+    localStorage.setItem('cs_data', JSON.stringify({ userData, userTags, savedMentors, ideaData }));
+  } catch(e) {
+    console.warn('[CareerSwipe] localStorage 寫入失敗，使用記憶體暫存');
+  }
+}
+loadStorage();
+
+// ═══════════════════════════════════════════════════════════════
+// 問卷渲染（14 題）
+// ═══════════════════════════════════════════════════════════════
+function renderQuestions() {
+  const c = document.getElementById('qContainer');
+  c.innerHTML = QUESTIONS_14.map((q, i) => `
+    <div class="q-card">
+      <div class="q-num">Q${i+1}<span class="q-dim-lbl">${q.lbl}</span>${q.isReverse ? '<span class="q-rev">反向題</span>' : ''}</div>
+      <div class="q-txt">${q.txt}</div>
+      <div class="q-opts" id="q14_${i}">
+        ${q.opts.map((o, j) => `
+          <button class="q-opt" data-idx="${j}" onclick="select14Opt(${i},${j})" id="q14_${i}_${j}">
+            <span class="q-opt-letter">${['A','B','C','D'][j]}</span>
+            ${o}
+          </button>`).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function select14Opt(qi, oi) {
+  document.querySelectorAll(`#q14_${qi} .q-opt`).forEach(b => b.classList.remove('sel'));
+  document.getElementById(`q14_${qi}_${oi}`).classList.add('sel');
+}
+renderQuestions();
+
+// ═══════════════════════════════════════════════════════════════
+// 進站流程
+// ═══════════════════════════════════════════════════════════════
+function obNext(sec) {
+  if (sec === 1) {
+    userData.name  = document.getElementById('uName').value || '張小晏';
+    userData.dept  = document.getElementById('uDept').value || '人類學系';
+    userData.grade = document.getElementById('uGrade').value;
+    userData.area  = document.getElementById('uArea').value;
+    showObSec(2);
+  }
+}
+function showObSec(n) {
+  document.querySelectorAll('.ob-section').forEach(s => s.classList.remove('on'));
+  document.getElementById('ob' + n).classList.add('on');
+  const steps = ['','步驟 1 / 2','步驟 2 / 2','處理中⋯'];
+  const titles = ['','基本資料','了解你自己','生成中'];
+  const descs  = ['','讓我們先認識你','選最接近你真實狀態的就好','分析你的標籤⋯⋯'];
+  document.getElementById('obStep').textContent  = steps[n];
+  document.getElementById('obTitle').textContent = titles[n];
+  document.getElementById('obDesc').textContent  = descs[n];
+  document.getElementById('obProg').style.width  = (n / 3 * 100) + '%';
+}
+
+function skipToProfile() {
+  initProfile();
+  goPg('profile');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 點子頁
+// ═══════════════════════════════════════════════════════════════
+function selectIdeaType(type, el) {
+  document.querySelectorAll('.idea-type-btn').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+  ideaData.type = type;
+}
+function toggleNeed(el, need) {
+  el.classList.toggle('sel');
+  if (el.classList.contains('sel')) {
+    if (!ideaData.needs.includes(need)) ideaData.needs.push(need);
+  } else {
+    ideaData.needs = ideaData.needs.filter(n => n !== need);
+  }
+}
+function saveIdea() {
+  ideaData.txt = document.getElementById('ideaTxt').value.trim();
+  if (!ideaData.type) ideaData.type = 'dream';
+  saveStorage();
+  initProfile();
+  goPg('profile');
+}
+function skipIdea() {
+  initProfile();
+  goPg('profile');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 吉祥物生成（六維雷達圖擬人化）
+// ═══════════════════════════════════════════════════════════════
+function getMascotType(scores) {
+  const vals = SKILL_DIMS.map(d => scores[d.key] || 0.3);
+  const avg  = vals.reduce((a,b) => a+b, 0) / vals.length;
+  const max  = Math.max(...vals);
+  const maxKey = SKILL_DIMS[vals.indexOf(max)].key;
+  const variance = vals.reduce((a,b) => a + (b-avg)*(b-avg), 0) / vals.length;
+  if (variance < 0.02) return { name:'平衡使者', desc:'六維均衡發展，適應力強', emoji:'◈' };
+  const names = { comm:'連結者', analy:'洞察者', creat:'創造者', lang:'橋梁者', exec:'實踐者', empa:'守護者' };
+  return { name: names[maxKey] || '探索者', desc:`以${SKILL_DIMS.find(d=>d.key===maxKey)?.lbl||''}為核心強項`, emoji:'◆' };
+}
+
+function drawMascot(scores, containerId, size = 110) {
+  const cx = size/2, cy = size/2, r = size * 0.38;
+  const n  = SKILL_DIMS.length;
+  const pts = SKILL_DIMS.map((d, i) => {
+    const angle = (Math.PI*2/n)*i - Math.PI/2;
+    const val   = scores[d.key] || 0.1;
+    return { x: cx + Math.cos(angle)*r*val, y: cy + Math.sin(angle)*r*val, val, d, angle };
+  });
+  const poly = pts.map(p => `${p.x},${p.y}`).join(' ');
+  const bgLines = SKILL_DIMS.map((_,i) => {
+    const angle = (Math.PI*2/n)*i - Math.PI/2;
+    return `<line x1="${cx}" y1="${cy}" x2="${cx+Math.cos(angle)*r}" y2="${cy+Math.sin(angle)*r}" stroke="var(--g2)" stroke-width="1"/>`;
+  }).join('');
+  const circles = [0.33,0.66,1].map(f =>
+    `<circle cx="${cx}" cy="${cy}" r="${r*f}" fill="none" stroke="var(--g2)" stroke-width="0.8" stroke-dasharray="${f<1?'3 3':''}"/>`
+  ).join('');
+  const dots = pts.map(p =>
+    `<circle cx="${p.x}" cy="${p.y}" r="4" fill="${p.d.color}" stroke="white" stroke-width="1.5"/>`
+  ).join('');
+  const sorted = [...pts].sort((a,b) => b.val - a.val);
+  const e1 = sorted[0], e2 = sorted[1];
+  const eR = size * 0.055;
+  const eyes = `
+    <circle cx="${e1.x}" cy="${e1.y}" r="${eR}" fill="white" stroke="${e1.d.color}" stroke-width="2"/>
+    <circle cx="${e1.x}" cy="${e1.y}" r="${eR*0.5}" fill="${e1.d.color}"/>
+    <circle cx="${e2.x}" cy="${e2.y}" r="${eR}" fill="white" stroke="${e2.d.color}" stroke-width="2"/>
+    <circle cx="${e2.x}" cy="${e2.y}" r="${eR*0.5}" fill="${e2.d.color}"/>`;
+  const smileX = cx, smileY = cy + r*0.15;
+  const smile = `<path d="M${smileX-r*0.12},${smileY} Q${smileX},${smileY+r*0.1} ${smileX+r*0.12},${smileY}" stroke="var(--g5)" stroke-width="1.5" fill="none" stroke-linecap="round"/>`;
+  const svg = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+    ${circles}${bgLines}
+    <polygon points="${poly}" fill="rgba(47,58,85,0.15)" stroke="var(--navy)" stroke-width="1.8" stroke-linejoin="round"/>
+    ${dots}${eyes}${smile}
+  </svg>`;
+  const el = document.getElementById(containerId);
+  if (el) el.innerHTML = svg;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 個人頁初始化
+// ═══════════════════════════════════════════════════════════════
+function initProfile() {
+  document.getElementById('pAva').textContent   = userData.name ? userData.name[0] : '張';
+  document.getElementById('pName').textContent  = userData.name || '張小晏';
+  document.getElementById('pDept').textContent  = `${userData.area||'台北市'} · ${userData.dept||'人類學系'} · ${userData.grade||'大四（應屆）'}`;
+  document.getElementById('navAva').textContent = userData.name ? userData.name[0] : '張';
+
+  // 六維技能（若有問卷結果則從五維轉換，否則預設）
+  const skills = Object.keys(userVector_5D).length
+    ? d5toSkills(userVector_5D)
+    : { comm:0.65, analy:0.55, creat:0.5, lang:0.4, exec:0.45, empa:0.8 };
+  userSkills6 = skills;
+
+  drawMascot(skills, 'mascotSvg', 120);
+  const mt = getMascotType(skills);
+  document.getElementById('mascotName').textContent = mt.emoji + ' ' + mt.name;
+  document.getElementById('mascotType').textContent = mt.desc;
+
+  // 技能條
+  document.getElementById('skillBars').innerHTML = SKILL_DIMS.map(d => `
+    <div class="skill-row">
+      <div class="skill-lbl">${d.lbl}</div>
+      <div class="skill-track"><div class="skill-fill" style="width:${(skills[d.key]||0)*100}%;background:${d.color}"></div></div>
+      <div style="font-size:11px;color:var(--g4);width:28px;text-align:right">${Math.round((skills[d.key]||0)*100)}</div>
+    </div>`).join('');
+
+  // 點子宣言
+  const icd = document.getElementById('ideaCardDisplay');
+  if (ideaData.txt) {
+    icd.classList.add('show');
+    document.getElementById('icdType').textContent = ideaData.type === 'idea' ? '💡 點子' : '💭 夢想';
+    document.getElementById('icdTxt').textContent  = ideaData.txt;
+    document.getElementById('icdNeeds').innerHTML  = ideaData.needs.map(n => `<span class="tag tam">${n}</span>`).join('');
+  } else {
+    icd.classList.remove('show');
+  }
+
+  // 可編輯標籤
+  renderEditableTags();
+
+  // 收藏
+  const sl = document.getElementById('savedList');
+  if (savedMentors.length) {
+    sl.innerHTML = savedMentors.map(id => {
+      const m = MENTORS[id];
+      return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--g1);cursor:pointer" onclick="openMentor(${m.id})">
+        <div style="width:36px;height:36px;border-radius:50%;background:${m.avaBg};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#FFFBF4;flex-shrink:0">${m.ava}</div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:700">${m.name}</div><div style="font-size:11px;color:var(--g4)">${m.role}</div></div>
+        <div style="font-size:12px;font-weight:700;color:var(--ok)">${m._simScore || '–'}%</div>
+      </div>`;
+    }).join('');
+  } else {
+    sl.innerHTML = '<div style="font-size:13px;color:var(--g4)">在前輩故事頁收藏後會出現在這裡</div>';
+  }
+
+  initStoryList();
+  initEnterprise();
+  document.getElementById('tabBar').style.display = 'flex';
+}
+
+// D5 向量→六維轉換（近似對應）
+function d5toSkills(v5) {
+  return {
+    comm:  clip((v5.D1||0.5) * 0.9),
+    analy: clip((v5.D2||0.5) * 0.85),
+    creat: clip((v5.D1||0.5) * 0.7 + (v5.D3||0.5) * 0.3),
+    lang:  clip(0.4 + Math.random()*0.3),
+    exec:  clip((v5.D4||0.5) * 0.9),
+    empa:  clip((v5.D5||0.5) * 0.95),
+  };
+}
+function clip(v) { return Math.min(1, Math.max(0.05, v)); }
+
+// ═══════════════════════════════════════════════════════════════
+// 可編輯標籤
+// ═══════════════════════════════════════════════════════════════
+function renderEditableTags() {
+  const ft = userTags.field.length ? userTags.field : ['台大人類學系','應屆畢業','質性研究','田野調查×2'];
+  const pt = userTags.psych.length ? userTags.psych : ['內在意義導向','方向空白型','以理解他人為驅動'];
+  userTags.field = ft; userTags.psych = pt;
+
+  document.getElementById('fieldTags').innerHTML = ft.map((t,i) =>
+    `<span class="tag-editable tb">${t}<span class="del" onclick="removeTag('field',${i})">×</span></span>`
+  ).join('');
+  document.getElementById('psychTags').innerHTML = pt.map((t,i) =>
+    `<span class="tag-editable tp">${t}<span class="del" onclick="removeTag('psych',${i})">×</span></span>`
+  ).join('');
+}
+
+function removeTag(type, idx) {
+  userTags[type].splice(idx, 1);
+  saveStorage();
+  renderEditableTags();
+}
+
+function addTag(type, e) {
+  if (e.key !== 'Enter') return;
+  const inp = document.getElementById(type === 'field' ? 'addFieldTagInp' : 'addPsychTagInp');
+  const val = inp.value.trim();
+  if (!val) return;
+  userTags[type].push(val);
+  inp.value = '';
+  saveStorage();
+  renderEditableTags();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 前輩故事列表
+// ═══════════════════════════════════════════════════════════════
+function initStoryList() {
+  renderStoryList(cs_mentorOrder);
+}
+
+function renderStoryList(order) {
+  const el = document.getElementById('storyList');
+  el.innerHTML = order.map(idx => {
+    const m = MENTORS[idx];
+    const pct = m._simScore || calcMatchFallback(idx);
+    const ideaBadge = m.ideaNote
+      ? `<div style="padding:8px 10px;background:var(--am-lt);border-radius:var(--r8);border-left:3px solid var(--am);font-size:11px;color:var(--am);margin-bottom:10px;font-style:italic">"${m.ideaNote}"</div>`
+      : '';
+    return `
+      <div class="mcard" onclick="openMentor(${m.id})">
+        <div class="mcard-top">
+          <div class="mcard-ava" style="background:${m.avaBg}">${m.ava}</div>
+          <div class="mcard-info">
+            <div class="mcard-name">${m.name}</div>
+            <div class="mcard-role">${m.role} · ${m.dept}</div>
+          </div>
+          <div class="mcard-pct"><div class="mcard-pct-n">${pct}%</div><div class="mcard-pct-l">配對</div></div>
+        </div>
+        <div class="mcard-body">
+          <div class="mcard-quote">${m.quote}</div>
+          ${ideaBadge}
+          <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px">${m.fieldTags.map(t=>`<span class="tag tb">${t}</span>`).join('')}</div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px">${m.psychTags.map(t=>`<span class="tag tp">${t}</span>`).join('')}</div>
+          <div class="mcard-actions">
+            <button class="btn btn-pr" style="flex:1;font-size:12px" onclick="event.stopPropagation();openMentor(${m.id})">查看完整故事</button>
+            <button class="btn btn-ok" style="font-size:12px" onclick="event.stopPropagation();saveMentor(${m.id})">收藏</button>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function filterStory(type, btn) {
+  document.querySelectorAll('.sfbtn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  let order = cs_mentorOrder;
+  if (type !== 'all') {
+    if (type === 'idea') order = cs_mentorOrder.filter(i => MENTORS[i].ideaNote);
+    else order = cs_mentorOrder.filter(i => MENTORS[i].type === type);
+  }
+  renderStoryList(order);
+}
+
+function calcMatchFallback(mid) {
+  const skills = userSkills6;
+  const m = MENTORS[mid].skills;
+  let dot=0, na=0, nb=0;
+  SKILL_DIMS.forEach(d => { dot+=skills[d.key]*m[d.key]; na+=skills[d.key]**2; nb+=m[d.key]**2; });
+  return na&&nb ? Math.round(dot/Math.sqrt(na)/Math.sqrt(nb)*100) : 75;
+}
+
+function saveMentor(id) {
+  if (!savedMentors.includes(id)) { savedMentors.push(id); saveStorage(); showToast('已收藏 ' + MENTORS[id].name); }
+  else showToast('已在收藏清單中');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Mentor 詳細頁
+// ═══════════════════════════════════════════════════════════════
+function openMentor(id) {
+  currentMentor = MENTORS[id];
+  const m = currentMentor;
+  document.getElementById('mpAva').textContent  = m.ava;
+  document.getElementById('mpAva').style.background = m.avaBg;
+  document.getElementById('mpName').textContent = m.name;
+  document.getElementById('mpRole').textContent = m.role + ' · ' + m.dept;
+  document.getElementById('mpQuote').textContent = m.quote;
+  document.getElementById('mpTagsWrap').innerHTML =
+    `<div style="margin-bottom:8px">${m.fieldTags.map(t=>`<span class="tag tb">${t}</span>`).join('')}</div>
+     <div>${m.psychTags.map(t=>`<span class="tag tp">${t}</span>`).join('')}</div>`;
+
+  // 吉祥物對照
+  const us = userSkills6;
+  setTimeout(() => { drawMascot(us, 'mcUserSvg', 88); drawMascot(m.skills, 'mcMentorSvg', 88); }, 20);
+  document.getElementById('mcUserName').textContent   = getMascotType(us).name;
+  document.getElementById('mcMentorName').textContent = getMascotType(m.skills).name;
+  const sim = m._simScore || calcMatchFallback(m.id);
+  document.getElementById('mcNote').textContent = `配對相似度 ${sim}%　·　${m.matchReason}`;
+
+  // 時間軸（三段式：做對了什麼 / 建議具備的經驗 / 建議）
+  document.getElementById('mpTimeline').innerHTML = `<div class="tl-lbl">人生路徑軸</div>` +
+    m.timeline.map((n, i) => {
+      const detailHtml = n.困境 ? `
+        <div style="margin-bottom:8px">
+          <div style="font-size:11px;font-weight:700;color:var(--g4);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px">當時的困境</div>
+          <div style="font-size:12px;color:var(--g6);line-height:1.65">${n.困境}</div>
+        </div>
+        ${n.did ? `<div style="padding:8px 10px;background:var(--ok-lt);border-radius:var(--r8);margin-bottom:6px">
+          <div style="font-size:10px;font-weight:700;color:var(--ok);margin-bottom:2px">✓ 做對了什麼</div>
+          <div style="font-size:12px;color:#3A4E3C;line-height:1.65">${n.did}</div>
+        </div>` : ''}
+        ${n.suggestion ? `<div style="padding:8px 10px;background:var(--navy-lt);border-radius:var(--r8);margin-bottom:6px">
+          <div style="font-size:10px;font-weight:700;color:var(--navy);margin-bottom:2px">→ 給你的建議</div>
+          <div style="font-size:12px;color:var(--navy-d);line-height:1.65">${n.suggestion}</div>
+        </div>` : ''}
+      ` : `<div style="font-size:12px;color:var(--g5);line-height:1.7">${n.detail}</div>`;
+
+      return `
+      <div class="tl-node">
+        <div class="tl-dot ${n.dotCls}">${n.dotCls==='cur'?'現':n.dotCls==='key'?'轉':i+1}</div>
+        <div class="tl-card" id="tlc${i}" onclick="toggleNode(${i})">
+          <div class="tl-period">${n.period}</div>
+          <div class="tl-label">${n.label}</div>
+          <div class="tl-mood-row">${n.mood.map(mo=>`<span class="tag tam" style="font-size:10px">${mo}</span>`).join('')}</div>
+          <div class="tl-quote">${n.quote}</div>
+          <div class="tl-detail">${detailHtml}</div>
+          ${n.困境?`<div class="tl-action"><button class="resonance-btn" onclick="event.stopPropagation();openGuide(${i})">這段對你有共鳴嗎？查看完整資源</button></div>`:''}
+        </div>
+      </div>`;
+    }).join('');
+
+  // 聯絡
+  document.getElementById('mpContact').innerHTML = `
+    <div class="slbl">聯絡與行動</div>
+    <div class="contact-note">${m.contact.note}</div>
+    ${m.contact.badges.length ? `<div class="badge-row">${m.contact.badges.map(b=>`<div class="badge">🏅 ${b}</div>`).join('')}</div>` : ''}
+    <label class="form-lbl">你的背景（一兩句話）</label>
+    <input class="form-inp" placeholder="例：台大人類學系應屆，有兩次田野調查經驗">
+    <label class="form-lbl">你想問的具體問題</label>
+    <textarea class="form-ta" placeholder="請傳送具體問題，Mentor 只需回覆一句話或一個問題釐清。"></textarea>
+    <div style="font-size:11px;color:var(--g4);margin-bottom:10px">Mentor 會在有空時決定是否回覆。平台不強制回覆。</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-pr" style="flex:1" onclick="sendContact()">寫信給 ${m.name}</button>
+      <button class="btn btn-ok" onclick="saveMentor(${m.id})">收藏</button>
+    </div>`;
+
+  goPg('mentor');
+}
+
+function toggleNode(i) {
+  document.getElementById('tlc' + i).classList.toggle('open');
+}
+
+// 指引卡（三段式：做對了什麼 / 建議具備什麼經驗 / 給建議）
+const GUIDE_DATA = [
+  {
+    title: '不知道所學能對應什麼職業',
+    sub: '很多人在這個節點停很久',
+    did: '你持續做著感覺對的事，即使當時說不出理由。這份堅持本身就是一種能力的積累——你已經知道「什麼讓你有感覺」，只是還沒找到那個名字。',
+    exp: [
+      '做過至少 1 次讓你覺得「很對」的事（田野、訪談、設計、寫作皆可）',
+      '能用一兩句話描述「那件事讓你有什麼感覺」',
+      '不需要有正式職稱，有真實經驗就夠了',
+    ],
+    advice: '先列出你做過讓自己感覺最對的三件事，用動詞描述核心動作（例：訪談人、整理資料、說服別人）。帶著這些動詞去搜尋職業關鍵字——你會發現有個職業的工作說明跟你做的事幾乎一樣。',
+    govRes: [
+      { t:'TYS 免費職涯諮詢', org:'臺北市青年局', icon:'🏛', u:'https://youth.gov.taipei/resources/7e6189d18bb50ab8d18b10deca5cc7a1b7449492' },
+      { t:'青年以戰代訓銜接職場', org:'臺北市青年局', icon:'🏛', u:'https://youth.gov.taipei/' },
+      { t:'青年學堂 — 跨域課程', org:'臺北市青年局', icon:'🏛', u:'https://www.class.tcyd.gov.taipei/' },
+    ],
+    courseRes: [
+      { t:'Design Thinking', org:'Coursera / IDEO U', icon:'📚', u:'https://www.coursera.org/learn/uva-darden-design-thinking-innovation' },
+      { t:'User Experience Research', org:'台大開放課程', icon:'🎓', u:'https://ocw.aca.ntu.edu.tw/' },
+    ],
+  },
+  {
+    title: '覺得自己的能力說不清楚',
+    sub: '複合型能力最容易讓人卡關',
+    did: '你累積了大量「說不清楚但真實存在」的能力。這種複合型能力往往比單一技能更有價值——你擅長的不是某一件工具，而是一種思維方式。',
+    exp: [
+      '有過至少 1 次需要「理解他人」的真實經驗（訪談、服務、輔導皆可）',
+      '能說出「在那件事裡，我做了什麼讓事情往前進」',
+      '試著把自己的能力用「動詞＋對象」描述，例如：分析使用者行為、說服主管改變決策',
+    ],
+    advice: '試著用職業語言重新命名你的能力：田野訪談 = 使用者研究、質性分析 = 洞察報告、說故事 = 品牌內容。你會發現市場一直在找你做的那件事，只是用了不同的名字說它。',
+    govRes: [
+      { t:'TYS 免費職涯諮詢', org:'臺北市青年局', icon:'🏛', u:'https://youth.gov.taipei/resources/7e6189d18bb50ab8d18b10deca5cc7a1b7449492' },
+      { t:'溝通力進化系列課程', org:'臺北市青年局', icon:'🏛', u:'https://www.class.tcyd.gov.taipei/participate/?mode=detail&node=445' },
+      { t:'青年職涯進修補助', org:'臺北市青年局', icon:'🏛', u:'https://youth.gov.taipei/services/05eb79e5-46b5-41e5-b1fd-0519d782b04a/0b17cb64-05d5-4d46-9981-d99dd9c77d36' },
+    ],
+    courseRes: [
+      { t:'Learning How to Learn', org:'Coursera / UCSD', icon:'📚', u:'https://www.coursera.org/learn/learning-how-to-learn' },
+      { t:'職場溝通與表達', org:'台大開放課程', icon:'🎓', u:'https://ocw.aca.ntu.edu.tw/' },
+    ],
+  },
+  {
+    title: '沒有技術背景，怕不夠格',
+    sub: '這是很多人轉職時的共同恐懼',
+    did: '你選擇去嘗試一個不確定自己做不做得到的方向。這種勇氣本身就是技術學不到的東西——很多公司找的就是「有主動意願去學」的人，而不是「已經都會了」的人。',
+    exp: [
+      '完成至少 1 個能展示的小作品或專案（哪怕只是課堂作業）',
+      '能說明「在這個專案裡我負責什麼、解決了什麼問題」',
+      '了解目標職位的日常工作內容（可透過資訊訪談或職缺說明）',
+    ],
+    advice: '找到你不需要技術的那個入口——研究、企劃、文案、客戶成功都是文組友善的切入點。先做一個小的真實專案，完成後放進作品集，一份具體的作品比任何學歷都有說服力。',
+    govRes: [
+      { t:'青年以戰代訓銜接職場', org:'臺北市青年局', icon:'🏛', u:'https://youth.gov.taipei/' },
+      { t:'青年實習津貼計畫', org:'臺北市青年局', icon:'🏛', u:'https://youth.gov.taipei/services/05eb79e5-46b5-41e5-b1fd-0519d782b04a/a41148e3-d08f-4f76-8b84-ea4f3ffcb258' },
+      { t:'臺北市青年實習平台', org:'臺北市青年局 × 104', icon:'🏛', u:'https://tpyd.104.com.tw/' },
+    ],
+    courseRes: [
+      { t:'Google UX Design Certificate', org:'Coursera / Google', icon:'📚', u:'https://www.coursera.org/professional-certificates/google-ux-design' },
+      { t:'Data Analysis with Python', org:'Coursera / IBM', icon:'📚', u:'https://www.coursera.org/learn/data-analysis-with-python' },
+      { t:'資料科學導論', org:'台大開放課程', icon:'🎓', u:'https://ocw.aca.ntu.edu.tw/' },
+    ],
+  },
+  {
+    title: '想走卻走不了',
+    sub: '每個轉折都需要一點勇氣',
+    did: '你在最難的時候仍然保持了對自己想要什麼的誠實。這是很多人失去的東西——明確知道「這裡不對」，是找到「那裡對」的第一步。',
+    exp: [
+      '清楚說得出「我不想繼續待在這裡的原因」（越具體越好）',
+      '有過至少一次「讓我感覺對」的工作或學習經驗，哪怕很短暫',
+      '願意接受「轉換過程中可能有一段收入較低的時期」',
+    ],
+    advice: '把最壞的情況寫下來，問自己：這個最壞的情況，我能接受嗎？如果可以，那恐懼只是習慣，不是理由。設一個成本最低的第一步——例如資訊訪談、週末去上一堂課——讓行動先發生，方向會在行動中變清楚。',
+    govRes: [
+      { t:'TYS 免費職涯諮詢', org:'臺北市青年局', icon:'🏛', u:'https://youth.gov.taipei/resources/7e6189d18bb50ab8d18b10deca5cc7a1b7449492' },
+      { t:'情緒覺察及紓壓課程', org:'臺北市青年局', icon:'🏛', u:'https://www.class.tcyd.gov.taipei/participate/?mode=detail&node=368' },
+      { t:'協助青年多元發展補助', org:'臺北市青年局', icon:'🏛', u:'https://youth.gov.taipei/services/05eb79e5-46b5-41e5-b1fd-0519d782b04a/b9acf730-1474-4b86-9d72-41a235d63314' },
+    ],
+    courseRes: [
+      { t:'The Science of Well-Being', org:'Coursera / Yale', icon:'📚', u:'https://www.coursera.org/learn/the-science-of-well-being' },
+      { t:'生涯規劃與職場倫理', org:'台大開放課程', icon:'🎓', u:'https://ocw.aca.ntu.edu.tw/' },
+    ],
+  },
+];
+
+function openGuide(nodeIdx) {
+  const m = currentMentor;
+  const node = m.timeline[nodeIdx];
+  let gData = GUIDE_DATA[0];
+  if (node.困境.includes('說不清')) gData = GUIDE_DATA[1];
+  else if (node.困境.includes('技術'))  gData = GUIDE_DATA[2];
+  else if (node.困境.includes('走不') || node.困境.includes('離開')) gData = GUIDE_DATA[3];
+
+  // 渲染「建議具備的經驗」列表
+  const expHtml = gData.exp.map(e =>
+    `<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:6px">
+      <div style="width:6px;height:6px;border-radius:50%;background:var(--navy);margin-top:6px;flex-shrink:0"></div>
+      <div style="font-size:12px;color:var(--navy-d);line-height:1.65">${e}</div>
+    </div>`
+  ).join('');
+
+  // 渲染政府資源卡片
+  const govHtml = gData.govRes.map(r =>
+    `<a href="${r.u}" target="_blank" rel="noopener" class="res-card res-card-gov">
+      <div class="res-card-icon">${r.icon}</div>
+      <div class="res-card-info">
+        <div class="res-card-name">${r.t}</div>
+        <div class="res-card-org">${r.org}</div>
+      </div>
+      <div class="res-card-arrow">›</div>
+    </a>`
+  ).join('');
+
+  // 渲染課程資源卡片
+  const courseHtml = gData.courseRes.map(r =>
+    `<a href="${r.u}" target="_blank" rel="noopener" class="res-card res-card-course">
+      <div class="res-card-icon">${r.icon}</div>
+      <div class="res-card-info">
+        <div class="res-card-name">${r.t}</div>
+        <div class="res-card-org">${r.org}</div>
+      </div>
+      <div class="res-card-arrow">›</div>
+    </a>`
+  ).join('');
+
+  document.getElementById('guideBody').innerHTML = `
+    <div class="guide-title">${gData.title}</div>
+    <div class="guide-sub">${gData.sub}</div>
+
+    <!-- 區塊一：做對了什麼 -->
+    <div class="guide-block guide-block-1">
+      <div class="guide-block-header">
+        <div class="guide-block-icon">✓</div>
+        <div class="guide-block-title">你在這個節點做對了什麼</div>
+      </div>
+      <div class="guide-block-body">${gData.did}</div>
+    </div>
+
+    <!-- 區塊二：建議具備什麼經驗 -->
+    <div class="guide-block guide-block-2">
+      <div class="guide-block-header">
+        <div class="guide-block-icon">◎</div>
+        <div class="guide-block-title">建議具備什麼經驗</div>
+      </div>
+      <div class="guide-block-body">${expHtml}</div>
+    </div>
+
+    <!-- 區塊三：給建議 -->
+    <div class="guide-block guide-block-3">
+      <div class="guide-block-header">
+        <div class="guide-block-icon">→</div>
+        <div class="guide-block-title">給你的具體建議</div>
+      </div>
+      <div class="guide-block-body">${gData.advice}</div>
+    </div>
+
+    <!-- 資源：政府計畫 -->
+    <div class="res-category" style="margin-top:16px">
+      <div class="res-section-lbl">延伸資源</div>
+      <div class="res-category-lbl">🏛 台北市政府青年局</div>
+      ${govHtml}
+    </div>
+
+    <!-- 資源：線上課程 -->
+    <div class="res-category">
+      <div class="res-category-lbl">📚 充實硬實力</div>
+      ${courseHtml}
+    </div>
+
+    <div style="margin-top:8px">
+      <button class="btn btn-pr btn-blk" onclick="closeGuide()">關閉</button>
+    </div>`;
+  document.getElementById('guideBg').classList.add('show');
+}
+function closeGuide(e) {
+  if (!e || e.target === document.getElementById('guideBg'))
+    document.getElementById('guideBg').classList.remove('show');
+}
+function sendContact() {
+  showToast('已送出聯繫請求，Mentor 會視時間決定是否回覆');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 企業端
+// ═══════════════════════════════════════════════════════════════
+function initEnterprise() {
+  // 人才列表
+  const tl = document.getElementById('talentList');
+  const talents = [
+    { ava:'張', bg:'#565449', name:'張小晏', dept:'台大人類學系・應屆', tags:['文組跨域','質性研究','有點子'], idea:'想為文組青年建立能力轉譯的管道' },
+    { ava:'王', bg:'#2F3A55', name:'王品心', dept:'政大社會系・大三', tags:['社會創新','有點子','金融轉型'], idea:'我有一個點子：讓金融業的 ESG 報告更有人味' },
+    { ava:'方', bg:'#3A5A40', name:'方佑心', dept:'台科大設計系・應屆', tags:['藝文創意','插畫','應屆畢業'], idea:null },
+  ];
+  tl.innerHTML = talents.map(t => `
+    <div class="talent-card" onclick="showToast('已開啟 ${t.name} 的職涯地圖')">
+      <div class="tc-top">
+        <div class="tc-ava" style="background:${t.bg}">${t.ava}</div>
+        <div class="tc-info"><div class="tc-name">${t.name}</div><div class="tc-dept">${t.dept}</div></div>
+        ${t.idea ? `<span class="tc-idea-badge">有點子</span>` : ''}
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">${t.tags.map(tg=>`<span class="tag tb" style="font-size:10px">${tg}</span>`).join('')}</div>
+      ${t.idea ? `<div class="tc-idea-txt">"${t.idea}"</div>` : ''}
+      <div class="tc-actions">
+        <button class="btn btn-pr btn-sm" onclick="event.stopPropagation();showToast('已開啟與 ${t.name} 的對話')">表達興趣</button>
+        <button class="btn btn-out btn-sm" onclick="event.stopPropagation();showToast('已查看 ${t.name} 的完整職涯地圖')">查看地圖</button>
+      </div>
+    </div>`).join('');
+
+  // 點子宣言列表
+  const il = document.getElementById('ideasList');
+  const ideas = [
+    { type:'dream', name:'張小晏', dept:'人類學系・應屆', txt:'我想為文組青年建立一個「能力轉譯服務」，幫他們把說不清楚的軟實力說清楚。', tags:['文組跨域','服務設計'] },
+    { type:'idea',  name:'王品心', dept:'政大社會系・大三', txt:'我有一個點子：讓金融業的 ESG 報告用更有溫度的方式呈現，連接金融與一般民眾。', tags:['金融轉型','內容策略','有點子'] },
+    { type:'dream', name:'林聿宸', dept:'台藝大・大三', txt:'我想成為獨立插畫師，但不知道怎麼直接接企業案子，不靠中間平台。', tags:['藝文創意','插畫'] },
+  ];
+  il.innerHTML = ideas.map(it => `
+    <div class="idea-item">
+      <div class="ii-header">
+        <span class="ii-type">${it.type==='idea'?'💡 點子':'💭 夢想'}</span>
+        <span class="ii-name">${it.name} · ${it.dept}</span>
+      </div>
+      <div class="ii-txt">"${it.txt}"</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">${it.tags.map(t=>`<span class="tag tam" style="font-size:10px">${t}</span>`).join('')}</div>
+      <div class="ii-actions">
+        <button class="btn btn-pr btn-sm" onclick="showToast('已向 ${it.name} 表達興趣')">表達興趣</button>
+        <button class="btn btn-out btn-sm" onclick="showToast('已邀請 ${it.name} 進一步對話')">主動邀請</button>
+      </div>
+    </div>`).join('');
+}
+
+function switchEntTab(tab, btn) {
+  document.querySelectorAll('.etbtn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  ['talent','ideas','notify','join'].forEach(t => {
+    const el = document.getElementById('ent-' + t);
+    if (el) el.style.display = t === tab ? 'block' : 'none';
+  });
+}
+
+function filterTalent(type, btn) {
+  document.querySelectorAll('#ent-talent .fbtn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  showToast(type === 'all' ? '顯示全部人才' : `篩選：${type}`);
+}
+function filterIdeas(type, btn) {
+  document.querySelectorAll('#ent-ideas .fbtn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  showToast(type === 'all' ? '顯示全部宣言' : `篩選：${type === 'dream' ? '夢想' : '點子'}`);
+}
+function toggleNotifyTag(el) {
+  el.style.opacity = el.style.opacity === '0.4' ? '1' : '0.4';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 頁面切換
+// ═══════════════════════════════════════════════════════════════
+function goPg(id) {
+  document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
+  document.getElementById('pg-' + id).classList.add('on');
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  const t = document.getElementById('tab-' + id);
+  if (t) t.classList.add('on');
+  document.getElementById('scrollArea').scrollTop = 0;
+  const showTab = ['profile','story','enterprise'].includes(id);
+  document.getElementById('tabBar').style.display = showTab ? 'flex' : 'none';
+  if (id === 'profile') initProfile();
+  if (id === 'story')   initStoryList();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// 若已有資料直接顯示 tab bar
+if (Object.keys(userVector_5D).length || userTags.field.length) {
+  document.getElementById('tabBar').style.display = 'flex';
+}
+</script>
+</body>
+</html>
